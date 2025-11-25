@@ -1,11 +1,11 @@
 {
-  "accountAssociation": {  // these will be added in step 5
+  "accountAssociation": {  
     "header": "",
     "payload": "",
     "signature": ""
   },
   "baseBuilder": {
-    "ownerAddress": "0x71f80b8eAafEB40c43D9B6aeaB2b2E7bE770C82b" // add your Base Account address here
+    "ownerAddress": "0x71f80b8eAafEB40c43D9B6aeaB2b2E7bE770C82b" 
   },
   {
   "frame": {
