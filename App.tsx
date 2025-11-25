@@ -34,19 +34,21 @@ const App: React.FC = () => {
   const [mintTxHash, setMintTxHash] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // Farcaster hook
+  // Farcaster MiniKit hook
   const { 
     isLoaded, 
     isInFrame, 
     user, 
-    walletAddress: farcasterWallet, 
+    walletAddress: farcasterWallet,
+    connectWallet,
     shareToWarpcast, 
-    openUrl 
+    openUrl,
+    sendTransaction 
   } = useFarcaster();
   
   const { mint, isLoading: isMinting, error: mintError } = useMint();
 
-  // Auto-connect if in Farcaster frame
+  // Auto-connect if in Farcaster frame with wallet
   useEffect(() => {
     if (isLoaded && isInFrame && farcasterWallet) {
       setWalletAddress(farcasterWallet);
@@ -54,29 +56,19 @@ const App: React.FC = () => {
     }
   }, [isLoaded, isInFrame, farcasterWallet]);
 
-  // Connect wallet (WalletConnect for browser, auto for Farcaster)
+  // Connect wallet using Farcaster MiniKit or MetaMask
   const handleConnect = async () => {
     setIsConnecting(true);
+    setScanError(null);
     
     try {
-      if (isInFrame && farcasterWallet) {
-        // Farcaster auto-connect
-        setWalletAddress(farcasterWallet);
+      const address = await connectWallet();
+      
+      if (address) {
+        setWalletAddress(address);
         setIsConnected(true);
       } else {
-        // WalletConnect for browser
-        if (!window.ethereum) {
-          throw new Error('Please install MetaMask or use WalletConnect');
-        }
-        
-        const accounts = await window.ethereum.request({ 
-          method: 'eth_requestAccounts' 
-        }) as string[];
-        
-        if (accounts && accounts.length > 0) {
-          setWalletAddress(accounts[0]);
-          setIsConnected(true);
-        }
+        throw new Error('Failed to connect wallet');
       }
     } catch (err: any) {
       console.error('Connect error:', err);
@@ -131,14 +123,14 @@ const App: React.FC = () => {
     }
   };
 
-  // Mint NFT
+  // Mint NFT using Farcaster MiniKit
   const handleMint = async () => {
     if (!userData) return;
     
     setMintStatus('pending');
     
     try {
-      const txHash = await mint(userData);
+      const txHash = await mint(userData, isInFrame);
       
       if (txHash) {
         setMintTxHash(txHash);

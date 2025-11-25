@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react';
 import { parseEther, encodeFunctionData } from 'viem';
+import sdk from '@farcaster/frame-sdk';
 import { UserGenesisData } from '../types';
 import { TREASURY_ADDRESS, NFT_CONTRACT_ADDRESS, NFT_ABI, MINT_PRICE } from '../config/wagmi';
 
 interface UseMintResult {
-  mint: (userData: UserGenesisData) => Promise<string | null>;
+  mint: (userData: UserGenesisData, isInFrame?: boolean) => Promise<string | null>;
   isLoading: boolean;
   error: string | null;
   txHash: string | null;
@@ -15,19 +16,21 @@ export const useMint = (): UseMintResult => {
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
 
-  const mint = useCallback(async (userData: UserGenesisData): Promise<string | null> => {
+  const mint = useCallback(async (userData: UserGenesisData, isInFrame: boolean = false): Promise<string | null> => {
     setIsLoading(true);
     setError(null);
     setTxHash(null);
 
     try {
-      // Check if window.ethereum exists
-      if (typeof window === 'undefined' || !window.ethereum) {
-        throw new Error('Please install a wallet like MetaMask or use Farcaster wallet');
+      // Get the appropriate provider
+      const provider = isInFrame ? sdk.wallet.ethProvider : window.ethereum;
+      
+      if (!provider) {
+        throw new Error('No wallet provider available');
       }
 
       // Request account access
-      const accounts = await window.ethereum.request({ 
+      const accounts = await provider.request({ 
         method: 'eth_requestAccounts' 
       }) as string[];
       
@@ -37,19 +40,17 @@ export const useMint = (): UseMintResult => {
 
       const account = accounts[0];
 
-      // Check if on Base network (chainId 8453)
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string;
-      if (chainId !== '0x2105') { // 8453 in hex
-        // Try to switch to Base
+      // Ensure on Base network (chainId 8453)
+      const chainId = await provider.request({ method: 'eth_chainId' }) as string;
+      if (chainId !== '0x2105') {
         try {
-          await window.ethereum.request({
+          await provider.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: '0x2105' }],
           });
         } catch (switchError: any) {
-          // If Base is not added, add it
           if (switchError.code === 4902) {
-            await window.ethereum.request({
+            await provider.request({
               method: 'wallet_addEthereumChain',
               params: [{
                 chainId: '0x2105',
@@ -65,10 +66,11 @@ export const useMint = (): UseMintResult => {
         }
       }
 
-      // If contract is not deployed yet, send directly to treasury
+      // Check if contract is deployed
       const isContractDeployed = NFT_CONTRACT_ADDRESS !== '0x0000000000000000000000000000000000000000';
       
       let hash: string;
+      const mintValue = '0x' + parseEther(MINT_PRICE).toString(16);
 
       if (isContractDeployed) {
         // Encode mint function call
@@ -83,25 +85,24 @@ export const useMint = (): UseMintResult => {
           ],
         });
 
-        // Send transaction to contract
-        hash = await window.ethereum.request({
+        hash = await provider.request({
           method: 'eth_sendTransaction',
           params: [{
             from: account,
             to: NFT_CONTRACT_ADDRESS,
-            value: parseEther(MINT_PRICE).toString(16),
+            value: mintValue,
             data: data,
           }],
         }) as string;
       } else {
-        // Send directly to treasury (pre-contract deployment)
-        hash = await window.ethereum.request({
+        // Send directly to treasury
+        hash = await provider.request({
           method: 'eth_sendTransaction',
           params: [{
             from: account,
             to: TREASURY_ADDRESS,
-            value: '0x' + parseEther(MINT_PRICE).toString(16),
-            data: '0x', // No data for simple transfer
+            value: mintValue,
+            data: '0x',
           }],
         }) as string;
       }
@@ -112,13 +113,12 @@ export const useMint = (): UseMintResult => {
     } catch (err: any) {
       console.error('Mint error:', err);
       
-      // Handle common errors
       if (err.code === 4001) {
-        setError('Transaction rejected by user');
+        setError('Transaction rejected');
       } else if (err.code === -32603) {
-        setError('Insufficient funds for gas');
+        setError('Insufficient funds');
       } else {
-        setError(err.message || 'Failed to mint NFT');
+        setError(err.message || 'Mint failed');
       }
       return null;
     } finally {
@@ -128,15 +128,3 @@ export const useMint = (): UseMintResult => {
 
   return { mint, isLoading, error, txHash };
 };
-
-// Add ethereum type to window
-declare global {
-  interface Window {
-    ethereum?: {
-      request: (args: { method: string; params?: any[] }) => Promise<unknown>;
-      on?: (event: string, callback: (...args: any[]) => void) => void;
-      removeListener?: (event: string, callback: (...args: any[]) => void) => void;
-      isMetaMask?: boolean;
-    };
-  }
-}

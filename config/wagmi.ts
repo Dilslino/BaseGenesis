@@ -1,6 +1,7 @@
 import { http, createConfig } from 'wagmi';
 import { base } from 'wagmi/chains';
-import { injected, walletConnect } from 'wagmi/connectors';
+import { injected } from 'wagmi/connectors';
+import { farcasterFrame } from '../lib/farcasterConnector';
 
 // Your wallet address for receiving mint payments
 export const TREASURY_ADDRESS = '0x0b7241893f2f6fBD71F5af6E09D896d190E5C339' as const;
@@ -12,17 +13,14 @@ export const NFT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000'
 export const MINT_PRICE = '0.0003';
 export const MINT_PRICE_WEI = 300000000000000n; // 0.0003 ETH in wei
 
-// WalletConnect Project ID (get from cloud.walletconnect.com)
-const projectId = 'YOUR_PROJECT_ID';
-
 export const wagmiConfig = createConfig({
   chains: [base],
   connectors: [
+    farcasterFrame(),
     injected(),
-    walletConnect({ projectId }),
   ],
   transports: {
-    [base.id]: http(),
+    [base.id]: http('https://mainnet.base.org'),
   },
 });
 
