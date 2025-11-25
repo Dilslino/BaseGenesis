@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 424 695">
+  <rect width="424" height="695" fill="#020205"/>
+  <circle cx="212" cy="200" r="150" fill="#0052FF" opacity="0.1"/>
+  
+  <rect x="172" y="280" width="80" height="80" rx="16" fill="#0052FF"/>
+  <text x="212" y="340" text-anchor="middle" font-family="Arial Black" font-size="50" fill="white">B</text>
+  
+  <text x="212" y="420" text-anchor="middle" font-family="Arial Black" font-size="32" fill="white">BaseGenesis</text>
+  <text x="212" y="460" text-anchor="middle" font-family="Arial" font-size="16" fill="#888">Discover Your Base Origin</text>
+  
+  <circle cx="212" cy="550" r="20" fill="none" stroke="#0052FF" stroke-width="3" opacity="0.5">
+    <animate attributeName="r" values="15;25;15" dur="1.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.5;0.2;0.5" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="212" cy="550" r="8" fill="#0052FF"/>
+</svg>

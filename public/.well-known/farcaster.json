@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjAsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIn0",
+    "payload": "eyJkb21haW4iOiJiYXNlZ2VuZXNpcy52ZXJjZWwuYXBwIn0",
+    "signature": "REPLACE_WITH_YOUR_SIGNATURE"
+  },
+  "frame": {
+    "version": "1",
+    "name": "BaseGenesis",
+    "iconUrl": "https://basegenesis.vercel.app/icon.png",
+    "homeUrl": "https://basegenesis.vercel.app",
+    "imageUrl": "https://basegenesis.vercel.app/og-image.png",
+    "buttonTitle": "Check Your Genesis",
+    "splashImageUrl": "https://basegenesis.vercel.app/splash.png",
+    "splashBackgroundColor": "#020205",
+    "webhookUrl": "https://basegenesis.vercel.app/api/webhook"
+  }
+}
