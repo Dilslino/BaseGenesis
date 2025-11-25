@@ -6,13 +6,13 @@
   },
   "frame": {
     "version": "1",
-    "name": "Example Frame",
+    "name": "BaseGenesis",
     "iconUrl": "https://basegenesis.vercel.app/icon.png",
     "homeUrl": "https://basegenesis.vercel.app",
     "imageUrl": "https://basegenesis.vercel.app/image.png",
     "buttonTitle": "Check this out",
     "splashImageUrl": "https://basegenesis.vercel.app/splash.png",
-    "splashBackgroundColor": "#eeccff",
+    "splashBackgroundColor": "#0052FF",
     "webhookUrl": "https://basegenesis.vercel.app/api/webhook"
   }
 }
