@@ -5,16 +5,14 @@
     "signature": "jsWnxdPBEIiNefxV3mklixw03yMnwEhT+NSSjOGD+q4Et48Xsq21lvTDJoTmVYDmTfXXlx4pkcMbtZ+i3R70vRw="
   },
   "frame": {
-    "name": "BaseGenesis",
     "version": "1",
+    "name": "Example Frame",
     "iconUrl": "https://basegenesis.vercel.app/icon.png",
     "homeUrl": "https://basegenesis.vercel.app",
     "imageUrl": "https://basegenesis.vercel.app/image.png",
+    "buttonTitle": "Check this out",
     "splashImageUrl": "https://basegenesis.vercel.app/splash.png",
-    "splashBackgroundColor": "#020205",
-    "webhookUrl": "https://basegenesis.vercel.app/api/webhook",
-    "subtitle": "Discover your first interaction on Base",
-    "description": "BaseGenesis is the easiest way to find your first transaction on the Base blockchain. Uncover your onchain history, see how early you were, and share your genesis moment with the community.",
-    "primaryCategory": "social"
+    "splashBackgroundColor": "#eeccff",
+    "webhookUrl": "https://basegenesis.vercel.app/api/webhook"
   }
 }
