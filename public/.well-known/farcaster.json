@@ -1,13 +1,9 @@
 {
-  "accountAssociation": {  //
-    "header": "",
-    "payload": "",
-    "signature": ""
+  "accountAssociation": {
+    "header": "eyJmaWQiOjIzODIzNiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweEEyQTc2RDhCNkE1MWQxNEM5MTQ1RjdFZkY4OTI0Qzg5MTZlMjFDODQifQ",
+    "payload": "eyJkb21haW4iOiJiYXNlZ2VuZXNpcy52ZXJjZWwuYXBwIn0",
+    "signature": "jsWnxdPBEIiNefxV3mklixw03yMnwEhT+NSSjOGD+q4Et48Xsq21lvTDJoTmVYDmTfXXlx4pkcMbtZ+i3R70vRw="
   },
-  "baseBuilder": {
-    "ownerAddress": "0x71f80b8eAafEB40c43D9B6aeaB2b2E7bE770C82b" //
-  },
-  {
   "frame": {
     "name": "BaseGenesis",
     "version": "1",
