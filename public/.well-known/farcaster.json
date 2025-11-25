@@ -1,17 +1,18 @@
 {
   "accountAssociation": {
-    "header": "eyJmaWQiOjEyMzQ1LCJ0eXBlIjoiY3VzdG9keSIsImtleSI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCJ9",
+    "header": "eyJmaWQiOjIzODIzNiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweEEyQTc2RDhCNkE1MWQxNEM5MTQ1RjdFZkY4OTI0Qzg5MTZlMjFDODQifQ",
     "payload": "eyJkb21haW4iOiJiYXNlZ2VuZXNpcy52ZXJjZWwuYXBwIn0",
-    "signature": "MHg4ZjU0NzY3YTNiNDJkMWE4ZjJlYzRhNmJjNWQ5ZjE4ZTdhOWI2YzNkMmY0YTVlNmI3YzhkOWUxZjJhM2I0YzVkNmU3YThiOWMxZDJmM2E0YjVjNmQ3ZThmOWExYjJjM2Q0ZTVmNmE3YjhjOWQxZTJmM2E0YjVjNmQ3ZThmOWExYg"
+    "signature": "jsWnxdPBEIiNefxV3mklixw03yMnwEhT+NSSjOGD+q4Et48Xsq21lvTDJoTmVYDmTfXXlx4pkcMbtZ+i3R70vRw="
   },
   "frame": {
     "version": "1",
     "name": "BaseGenesis",
     "iconUrl": "https://basegenesis.vercel.app/icon.png",
     "homeUrl": "https://basegenesis.vercel.app",
-    "imageUrl": "https://basegenesis.vercel.app/og-image.svg",
-    "buttonTitle": "Discover Your Genesis",
-    "splashImageUrl": "https://basegenesis.vercel.app/splash.svg",
-    "splashBackgroundColor": "#020205"
+    "imageUrl": "https://basegenesis.vercel.app/image.png",
+    "buttonTitle": "Check this out",
+    "splashImageUrl": "https://basegenesis.vercel.app/splash.png",
+    "splashBackgroundColor": "#0052FF",
+    "webhookUrl": "https://basegenesis.vercel.app/api/webhook"
   }
 }
