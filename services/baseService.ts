@@ -113,7 +113,9 @@ export const getBaseGenesisData = async (address: string): Promise<UserGenesisDa
     const isPreLaunch = txDate < BASE_LAUNCH_DATE;
 
     let rank = UserRank.BASE_CITIZEN;
-    if (isPreLaunch || daysSinceLaunch <= RANK_THRESHOLDS.PIONEER_DAYS) {
+    if (isPreLaunch || daysSinceLaunch <= RANK_THRESHOLDS.OG_DAYS) {
+      rank = UserRank.OG_LEGEND;
+    } else if (daysSinceLaunch <= RANK_THRESHOLDS.PIONEER_DAYS) {
       rank = UserRank.GENESIS_PIONEER;
     } else if (daysSinceLaunch <= RANK_THRESHOLDS.SETTLER_DAYS) {
       rank = UserRank.EARLY_SETTLER;

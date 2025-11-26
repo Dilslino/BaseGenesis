@@ -13,6 +13,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
   // Sort by days (descending) and then by rank weight
   const sortedEntries = useMemo(() => {
     const rankWeight = {
+      [UserRank.OG_LEGEND]: 4,
       [UserRank.GENESIS_PIONEER]: 3,
       [UserRank.EARLY_SETTLER]: 2,
       [UserRank.BASE_CITIZEN]: 1,
