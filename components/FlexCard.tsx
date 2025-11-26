@@ -1,7 +1,7 @@
 import React from 'react';
 import { UserGenesisData, UserRank } from '../types';
 import { RANK_COLORS } from '../constants';
-import { Hash, Calendar, Layers, Crown } from 'lucide-react';
+import { Hash, Calendar, Layers, Crown, Trophy, Sparkles } from 'lucide-react';
 
 interface FlexCardProps {
   data: UserGenesisData;
@@ -18,32 +18,72 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
   const shortHash = `${data.firstTxHash.slice(0, 4)}...${data.firstTxHash.slice(-4)}`;
   const gradientColor = RANK_COLORS[data.rank] || "from-gray-700 to-gray-800";
   const isOG = data.rank === UserRank.OG_LEGEND;
+  const isPioneer = data.rank === UserRank.GENESIS_PIONEER;
 
   return (
-    <div className="relative w-full aspect-[1.58/1] max-w-[320px] mx-auto perspective-1000 group select-none">
+    <div className={`relative w-full aspect-[1.58/1] max-w-[320px] mx-auto perspective-1000 group select-none ${isOG || isPioneer ? 'float-animation' : ''}`}>
       
-      {/* Animated Glow Behind - Extra glow for OG */}
-      <div className={`absolute -inset-1 bg-gradient-to-r ${gradientColor} rounded-2xl blur-lg ${isOG ? 'opacity-60 group-hover:opacity-80 animate-pulse' : 'opacity-40 group-hover:opacity-60'} transition duration-700`}></div>
+      {/* Animated Glow Behind */}
+      <div className={`absolute -inset-1 bg-gradient-to-r ${gradientColor} rounded-2xl blur-lg transition duration-700 ${
+        isOG ? 'opacity-70 group-hover:opacity-90' : 
+        isPioneer ? 'opacity-50 group-hover:opacity-70' : 
+        'opacity-40 group-hover:opacity-60'
+      }`}></div>
       
-      {/* Extra sparkle effect for OG */}
+      {/* OG Special Effects */}
       {isOG && (
         <>
-          <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-2xl blur-2xl opacity-30 animate-pulse"></div>
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full"></div>
+          {/* Rotating ring */}
+          <div className="absolute -inset-3 rounded-2xl border-2 border-dashed border-yellow-500/30 animate-[rotate-slow_20s_linear_infinite]"></div>
+          {/* Outer glow pulse */}
+          <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-2xl blur-2xl opacity-40 animate-pulse"></div>
+          {/* Top shine line */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full animate-pulse"></div>
+          {/* Sparkle particles */}
+          <div className="absolute -top-2 -left-2 sparkle-particle">
+            <Sparkles className="w-4 h-4 text-yellow-400" />
+          </div>
+          <div className="absolute -top-1 -right-3 sparkle-particle" style={{ animationDelay: '0.5s' }}>
+            <Sparkles className="w-3 h-3 text-orange-400" />
+          </div>
+          <div className="absolute -bottom-2 -right-1 sparkle-particle" style={{ animationDelay: '1s' }}>
+            <Sparkles className="w-4 h-4 text-yellow-300" />
+          </div>
+        </>
+      )}
+
+      {/* Pioneer Special Effects */}
+      {isPioneer && (
+        <>
+          <div className="absolute -inset-1 bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-400 rounded-2xl blur-xl opacity-30 animate-pulse"></div>
+          <div className="absolute -top-1 -right-1 sparkle-particle">
+            <Trophy className="w-4 h-4 text-amber-400" />
+          </div>
         </>
       )}
       
       {/* Card Container */}
-      <div className={`relative h-full w-full backdrop-blur-2xl border rounded-xl overflow-hidden shadow-2xl flex flex-col justify-between p-4 sm:p-5 ${isOG ? 'bg-gradient-to-br from-[#0a0805]/95 via-[#050508]/95 to-[#080502]/95 border-yellow-500/30' : 'bg-[#050508]/90 border-white/10'}`}>
+      <div className={`relative h-full w-full backdrop-blur-2xl border rounded-xl overflow-hidden shadow-2xl flex flex-col justify-between p-4 sm:p-5 ${
+        isOG ? 'bg-gradient-to-br from-[#0a0805]/95 via-[#050508]/95 to-[#080502]/95 border-yellow-500/40 card-og' : 
+        isPioneer ? 'bg-gradient-to-br from-[#080505]/95 via-[#050508]/95 to-[#050502]/95 border-amber-500/30 card-pioneer' :
+        'bg-[#050508]/90 border-white/10'
+      }`}>
         
         {/* Background Noise/Texture */}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
-        <div className={`absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br ${gradientColor} blur-[60px] ${isOG ? 'opacity-50' : 'opacity-30'} rounded-full`}></div>
+        <div className={`absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br ${gradientColor} blur-[60px] ${isOG ? 'opacity-60' : isPioneer ? 'opacity-40' : 'opacity-30'} rounded-full`}></div>
         
-        {/* Extra OG decoration */}
+        {/* OG Crown decoration */}
         {isOG && (
-          <div className="absolute top-2 right-2 animate-bounce">
-            <Crown className="w-6 h-6 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]" />
+          <div className="absolute top-2 right-2 crown-icon">
+            <Crown className="w-7 h-7 text-yellow-400" />
+          </div>
+        )}
+
+        {/* Pioneer Trophy decoration */}
+        {isPioneer && (
+          <div className="absolute top-2 right-2 float-animation">
+            <Trophy className="w-6 h-6 text-amber-400 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]" />
           </div>
         )}
 
@@ -65,11 +105,20 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
 
         {/* Middle: Rank */}
         <div className="z-10 relative my-1 sm:my-2">
-            <h2 className={`text-2xl min-[340px]:text-3xl font-black italic tracking-tighter drop-shadow-lg truncate ${isOG ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-500 animate-pulse' : 'text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400'}`}>
+            <h2 className={`text-2xl min-[340px]:text-3xl font-black italic tracking-tighter drop-shadow-lg truncate ${
+              isOG ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-500 og-title' : 
+              isPioneer ? 'text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-yellow-500' :
+              'text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400'
+            }`}>
               {isOG && <span className="mr-1">👑</span>}
+              {isPioneer && <span className="mr-1">🏆</span>}
               {data.rank.split(' ')[0]} <span className="text-lg sm:text-2xl">{data.rank.split(' ')[1]}</span>
             </h2>
-            <div className={`h-0.5 w-12 bg-gradient-to-r ${isOG ? 'from-yellow-400 via-orange-500 to-transparent w-16' : 'from-base-blue to-transparent'} mt-1`}></div>
+            <div className={`h-0.5 bg-gradient-to-r mt-1 ${
+              isOG ? 'from-yellow-400 via-orange-500 to-transparent w-20' : 
+              isPioneer ? 'from-amber-400 via-orange-400 to-transparent w-16' :
+              'from-base-blue to-transparent w-12'
+            }`}></div>
         </div>
 
         {/* Bottom: Stats Grid */}

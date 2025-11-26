@@ -66,7 +66,73 @@
     50% { background-position: 100% 50%; }
   }
 
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+  }
+
+  @keyframes sparkle {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+
+  @keyframes rotate-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes border-dance {
+    0%, 100% { 
+      border-color: rgba(250, 204, 21, 0.5);
+      box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+    }
+    25% { 
+      border-color: rgba(251, 146, 60, 0.5);
+      box-shadow: 0 0 25px rgba(251, 146, 60, 0.4);
+    }
+    50% { 
+      border-color: rgba(239, 68, 68, 0.5);
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+    }
+    75% { 
+      border-color: rgba(251, 146, 60, 0.5);
+      box-shadow: 0 0 25px rgba(251, 146, 60, 0.4);
+    }
+  }
+
+  @keyframes pioneer-glow {
+    0%, 100% { 
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+    }
+    50% { 
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.6), 0 0 60px rgba(245, 158, 11, 0.2);
+    }
+  }
+
+  @keyframes text-shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  @keyframes crown-float {
+    0%, 100% { 
+      transform: translateY(0) rotate(-5deg); 
+      filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.8));
+    }
+    50% { 
+      transform: translateY(-4px) rotate(5deg); 
+      filter: drop-shadow(0 0 15px rgba(250, 204, 21, 1));
+    }
+  }
+
   --animate-gradient-x: gradient-x 3s ease infinite;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-sparkle: sparkle 2s ease-in-out infinite;
+  --animate-rotate-slow: rotate-slow 20s linear infinite;
+  --animate-border-dance: border-dance 3s ease-in-out infinite;
+  --animate-pioneer-glow: pioneer-glow 2s ease-in-out infinite;
+  --animate-text-shimmer: text-shimmer 3s linear infinite;
+  --animate-crown-float: crown-float 2s ease-in-out infinite;
 }
 
 @layer base {
@@ -99,5 +165,30 @@
   .hero-title {
     background-size: 200% 200%;
     animation: gradient-x 3s ease infinite;
+  }
+
+  .card-og {
+    animation: border-dance 3s ease-in-out infinite;
+  }
+
+  .card-pioneer {
+    animation: pioneer-glow 2s ease-in-out infinite;
+  }
+
+  .og-title {
+    background-size: 200% auto;
+    animation: text-shimmer 3s linear infinite;
+  }
+
+  .crown-icon {
+    animation: crown-float 2s ease-in-out infinite;
+  }
+
+  .sparkle-particle {
+    animation: sparkle 2s ease-in-out infinite;
+  }
+
+  .float-animation {
+    animation: float 3s ease-in-out infinite;
   }
 }
