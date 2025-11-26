@@ -156,7 +156,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="w-full h-screen max-w-[424px] mx-auto bg-base-black text-white font-sans flex flex-col relative overflow-hidden">
+    <div className="w-full h-screen max-w-full sm:max-w-[480px] md:max-w-[520px] lg:max-w-[560px] mx-auto bg-base-black text-white font-sans flex flex-col relative overflow-hidden">
       
       {/* Confetti Effect */}
       {showConfetti && (

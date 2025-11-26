@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Wallet, ChevronRight, Zap, LogOut, Users } from 'lucide-react';
+import { Wallet, LogOut, Users } from 'lucide-react';
 import { Button } from './Button';
 
 interface HomeViewProps {
@@ -68,21 +68,21 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <div className="flex-grow flex flex-col justify-center space-y-6 px-2">
         
         {/* Hero */}
-        <div className="text-center space-y-3">
-          <h1 className="text-3xl font-black tracking-tight leading-tight">
+        <div className="text-center space-y-3 sm:space-y-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-tight">
             Discover Your{' '}
             <span className="hero-title text-transparent bg-clip-text bg-gradient-to-r from-base-blue via-purple-400 to-cyan-300 animate-gradient-x">
               Base Origin
             </span>
           </h1>
           
-          <p className="text-gray-400 text-sm max-w-[300px] mx-auto">
+          <p className="text-gray-400 text-sm sm:text-base max-w-[300px] sm:max-w-[360px] mx-auto">
             Find out when you first joined Base and earn your Genesis rank
           </p>
         </div>
 
         {/* Wallet Connection Card */}
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-4">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 space-y-4">
           {isConnected ? (
             <>
               <div className="flex items-center justify-between">
@@ -107,15 +107,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </div>
               </div>
               
-              <Button
-                variant="mint"
+              <button
                 onClick={onNavigateToScan}
-                className="w-full !py-3"
-                icon={<Zap className="w-5 h-5" />}
+                className="w-full py-3.5 sm:py-4 rounded-2xl font-semibold text-white text-sm sm:text-base
+                  bg-gradient-to-r from-base-blue/80 via-indigo-500/80 to-purple-500/80
+                  hover:from-base-blue hover:via-indigo-500 hover:to-purple-500
+                  backdrop-blur-sm border border-white/10 hover:border-white/20
+                  shadow-lg shadow-base-blue/20 hover:shadow-base-blue/40
+                  transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Scan My Wallet
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
+              </button>
 
               {!isInFrame && (
                 <button
@@ -156,41 +158,41 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
         {/* Rank Preview */}
         <div className="space-y-3">
-          <p className="text-[10px] text-gray-500 uppercase tracking-widest text-center">Possible Genesis Ranks</p>
-          <div className="grid grid-cols-3 gap-2">
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-center">
-              <span className="text-2xl">🏆</span>
-              <p className="text-amber-400 text-xs font-bold mt-1">Pioneer</p>
-              <p className="text-gray-500 text-[10px]">Day 1</p>
+          <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest text-center">Possible Genesis Ranks</p>
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-2.5 sm:p-3 text-center">
+              <span className="text-xl sm:text-2xl">🏆</span>
+              <p className="text-amber-400 text-[11px] sm:text-xs font-bold mt-1">Pioneer</p>
+              <p className="text-gray-500 text-[9px] sm:text-[10px]">Day 1</p>
             </div>
-            <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-3 text-center">
-              <span className="text-2xl">⚡</span>
-              <p className="text-cyan-400 text-xs font-bold mt-1">Settler</p>
-              <p className="text-gray-500 text-[10px]">Early</p>
+            <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-2.5 sm:p-3 text-center">
+              <span className="text-xl sm:text-2xl">⚡</span>
+              <p className="text-cyan-400 text-[11px] sm:text-xs font-bold mt-1">Settler</p>
+              <p className="text-gray-500 text-[9px] sm:text-[10px]">Early</p>
             </div>
-            <div className="bg-slate-500/10 border border-slate-500/20 rounded-xl p-3 text-center">
-              <span className="text-2xl">🌐</span>
-              <p className="text-slate-400 text-xs font-bold mt-1">Citizen</p>
-              <p className="text-gray-500 text-[10px]">Builder</p>
+            <div className="bg-slate-500/10 border border-slate-500/20 rounded-xl p-2.5 sm:p-3 text-center">
+              <span className="text-xl sm:text-2xl">🌐</span>
+              <p className="text-slate-400 text-[11px] sm:text-xs font-bold mt-1">Citizen</p>
+              <p className="text-gray-500 text-[9px] sm:text-[10px]">Builder</p>
             </div>
           </div>
         </div>
 
         {/* Live Scan Counter */}
-        <div className="bg-gradient-to-r from-base-blue/10 via-purple-500/10 to-cyan-500/10 border border-white/10 rounded-xl p-4">
-          <div className="flex items-center justify-center gap-3">
-            <div className="flex items-center gap-2">
+        <div className="bg-gradient-to-r from-base-blue/10 via-purple-500/10 to-cyan-500/10 border border-white/10 rounded-xl p-3 sm:p-4">
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <div className="relative">
-                <Users className="w-5 h-5 text-base-blue" />
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-base-blue" />
+                <span className="absolute -top-1 -right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-pulse" />
               </div>
-              <span className="text-gray-400 text-sm">Wallets Scanned</span>
+              <span className="text-gray-400 text-xs sm:text-sm">Wallets Scanned</span>
             </div>
-            <div className="font-mono text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-base-blue to-cyan-400">
+            <div className="font-mono text-lg sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-base-blue to-cyan-400">
               <AnimatedCounter value={scanCount} />
             </div>
           </div>
-          <p className="text-center text-gray-500 text-[10px] mt-2">Live counter updating in real-time</p>
+          <p className="text-center text-gray-500 text-[9px] sm:text-[10px] mt-1.5 sm:mt-2">Live counter updating in real-time</p>
         </div>
       </div>
     </div>
