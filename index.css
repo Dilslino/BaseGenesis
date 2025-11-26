@@ -60,6 +60,13 @@
     from { box-shadow: 0 0 10px rgba(0, 82, 255, 0.3); }
     to { box-shadow: 0 0 20px rgba(0, 82, 255, 0.6); }
   }
+
+  @keyframes gradient-x {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  --animate-gradient-x: gradient-x 3s ease infinite;
 }
 
 @layer base {
@@ -85,5 +92,12 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+@layer components {
+  .hero-title {
+    background-size: 200% 200%;
+    animation: gradient-x 3s ease infinite;
   }
 }

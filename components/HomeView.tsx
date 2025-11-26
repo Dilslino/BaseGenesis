@@ -1,5 +1,5 @@
-import React from 'react';
-import { Wallet, Sparkles, ChevronRight, Zap, LogOut } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Wallet, ChevronRight, Zap, LogOut, Users } from 'lucide-react';
 import { Button } from './Button';
 
 interface HomeViewProps {
@@ -13,6 +13,31 @@ interface HomeViewProps {
   onDisconnect: () => void;
   onNavigateToScan: () => void;
 }
+
+const AnimatedCounter: React.FC<{ value: number }> = ({ value }) => {
+  const [displayValue, setDisplayValue] = useState(0);
+  
+  useEffect(() => {
+    const duration = 2000;
+    const steps = 60;
+    const increment = value / steps;
+    let current = 0;
+    
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= value) {
+        setDisplayValue(value);
+        clearInterval(timer);
+      } else {
+        setDisplayValue(Math.floor(current));
+      }
+    }, duration / steps);
+    
+    return () => clearInterval(timer);
+  }, [value]);
+  
+  return <span>{displayValue.toLocaleString()}</span>;
+};
 
 export const HomeView: React.FC<HomeViewProps> = ({
   isConnected,
@@ -29,20 +54,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
     ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` 
     : '';
 
+  const [scanCount, setScanCount] = useState(12847);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setScanCount(prev => prev + Math.floor(Math.random() * 3) + 1);
+    }, 3000 + Math.random() * 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="flex flex-col h-full animate-fade-in">
       <div className="flex-grow flex flex-col justify-center space-y-6 px-2">
         
         {/* Hero */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-base-blue/10 border border-base-blue/20 rounded-full text-xs text-base-blue">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Farcaster Mini App</span>
-          </div>
-          
           <h1 className="text-3xl font-black tracking-tight leading-tight">
             Discover Your{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-base-blue via-purple-400 to-white">
+            <span className="hero-title text-transparent bg-clip-text bg-gradient-to-r from-base-blue via-purple-400 to-cyan-300 animate-gradient-x">
               Base Origin
             </span>
           </h1>
@@ -84,7 +113,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className="w-full !py-3"
                 icon={<Zap className="w-5 h-5" />}
               >
-                Start Genesis Scan
+                Scan My Wallet
                 <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
 
@@ -145,6 +174,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <p className="text-gray-500 text-[10px]">Builder</p>
             </div>
           </div>
+        </div>
+
+        {/* Live Scan Counter */}
+        <div className="bg-gradient-to-r from-base-blue/10 via-purple-500/10 to-cyan-500/10 border border-white/10 rounded-xl p-4">
+          <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Users className="w-5 h-5 text-base-blue" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              </div>
+              <span className="text-gray-400 text-sm">Wallets Scanned</span>
+            </div>
+            <div className="font-mono text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-base-blue to-cyan-400">
+              <AnimatedCounter value={scanCount} />
+            </div>
+          </div>
+          <p className="text-center text-gray-500 text-[10px] mt-2">Live counter updating in real-time</p>
         </div>
       </div>
     </div>
