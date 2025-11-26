@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Zap, Share2, ExternalLink, CheckCircle } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { Button } from './components/Button';
 import { FlexCard } from './components/FlexCard';
 import { BottomNav, TabType } from './components/BottomNav';
@@ -8,12 +8,12 @@ import { ScanView } from './components/ScanView';
 import { ProfileView } from './components/ProfileView';
 import { Leaderboard } from './components/Leaderboard';
 import { LoadingSequence } from './components/LoadingSequence';
+import { DonateModal } from './components/DonateModal';
 import { getBaseGenesisData } from './services/baseService';
 import { useFarcaster } from './hooks/useFarcaster';
-import { useMint } from './hooks/useMint';
+import { useDonate } from './hooks/useDonate';
 import { UserGenesisData } from './types';
 import { MOCK_LEADERBOARD, SHARE_MESSAGES, RANK_EMOJI } from './constants';
-import { MINT_PRICE } from './config/wagmi';
 
 const App: React.FC = () => {
   // Navigation
@@ -29,9 +29,8 @@ const App: React.FC = () => {
   const [scanError, setScanError] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserGenesisData | null>(null);
   
-  // Mint state
-  const [mintStatus, setMintStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
-  const [mintTxHash, setMintTxHash] = useState<string | null>(null);
+  // Donate state
+  const [showDonateModal, setShowDonateModal] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
   // Farcaster MiniKit hook
@@ -43,10 +42,9 @@ const App: React.FC = () => {
     connectWallet,
     shareToWarpcast, 
     openUrl,
-    sendTransaction 
   } = useFarcaster();
   
-  const { mint, isLoading: isMinting, error: mintError } = useMint();
+  const { donate, isLoading: isDonating } = useDonate();
 
   // Auto-connect if in Farcaster frame with wallet
   useEffect(() => {
@@ -123,27 +121,14 @@ const App: React.FC = () => {
     }
   };
 
-  // Mint NFT using Farcaster MiniKit
-  const handleMint = async () => {
-    if (!userData) return;
-    
-    setMintStatus('pending');
-    
-    try {
-      const txHash = await mint(userData, isInFrame);
-      
-      if (txHash) {
-        setMintTxHash(txHash);
-        setMintStatus('success');
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 3000);
-      } else {
-        setMintStatus('error');
-      }
-    } catch (err) {
-      console.error('Mint failed:', err);
-      setMintStatus('error');
+  // Handle donate
+  const handleDonate = async (amount: string, token: 'ETH' | 'USDC'): Promise<string | null> => {
+    const txHash = await donate(amount, token, isInFrame);
+    if (txHash) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
     }
+    return txHash;
   };
 
   // Loading screen
@@ -261,56 +246,21 @@ const App: React.FC = () => {
               onViewBasescan={handleViewBasescan}
             />
 
-            {/* Mint Section */}
+            {/* Donate Section */}
             <div className="mt-auto pt-2">
-              {mintStatus === 'success' ? (
-                <div className="p-3 bg-green-500/20 border border-green-500/50 rounded-xl text-center space-y-2">
-                  <div className="flex items-center justify-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <p className="text-green-400 font-bold text-sm">NFT Minted!</p>
-                  </div>
-                  <div className="flex gap-2">
-                    {mintTxHash && (
-                      <button
-                        onClick={() => openUrl(`https://basescan.org/tx/${mintTxHash}`)}
-                        className="flex-1 px-3 py-2 bg-white/5 rounded-lg text-xs text-gray-300 hover:bg-white/10 transition"
-                      >
-                        Basescan
-                      </button>
-                    )}
-                    <button
-                      onClick={() => openUrl('https://opensea.io/account')}
-                      className="flex-1 px-3 py-2 bg-blue-600 rounded-lg text-xs text-white font-semibold hover:bg-blue-700 transition"
-                    >
-                      OpenSea
-                    </button>
-                  </div>
-                </div>
-              ) : mintStatus === 'error' ? (
-                <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-center space-y-2">
-                  <p className="text-red-400 text-sm">{mintError || 'Mint failed'}</p>
-                  <Button variant="secondary" onClick={() => setMintStatus('idle')} className="!text-xs !py-1.5">
-                    Try Again
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  variant="mint"
-                  onClick={handleMint}
-                  disabled={mintStatus === 'pending' || isMinting}
-                  className="w-full !py-3"
-                  icon={<Zap className="w-5 h-5 fill-current" />}
-                >
-                  {mintStatus === 'pending' || isMinting ? (
-                    <span className="flex items-center gap-2">
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Minting...
-                    </span>
-                  ) : (
-                    `Mint Genesis NFT (${MINT_PRICE} ETH)`
-                  )}
-                </Button>
-              )}
+              <button
+                onClick={() => setShowDonateModal(true)}
+                className="w-full py-3.5 rounded-2xl font-semibold text-white text-sm
+                  bg-gradient-to-r from-pink-500/80 via-purple-500/80 to-indigo-500/80
+                  hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500
+                  backdrop-blur-sm border border-white/10 hover:border-white/20
+                  shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40
+                  transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
+                  flex items-center justify-center gap-2"
+              >
+                <Heart className="w-5 h-5" />
+                Support the Creator
+              </button>
             </div>
           </div>
         )}
@@ -337,6 +287,14 @@ const App: React.FC = () => {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         hasScanned={!!userData}
+      />
+
+      {/* Donate Modal */}
+      <DonateModal
+        isOpen={showDonateModal}
+        onClose={() => setShowDonateModal(false)}
+        onDonate={handleDonate}
+        isLoading={isDonating}
       />
     </div>
   );

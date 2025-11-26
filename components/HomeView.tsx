@@ -159,21 +159,26 @@ export const HomeView: React.FC<HomeViewProps> = ({
         {/* Rank Preview */}
         <div className="space-y-3">
           <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest text-center">Possible Genesis Ranks</p>
-          <div className="grid grid-cols-3 gap-2 sm:gap-3">
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-2.5 sm:p-3 text-center">
-              <span className="text-xl sm:text-2xl">🏆</span>
-              <p className="text-amber-400 text-[11px] sm:text-xs font-bold mt-1">Pioneer</p>
-              <p className="text-gray-500 text-[9px] sm:text-[10px]">Day 1</p>
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+            <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl p-2 sm:p-2.5 text-center">
+              <span className="text-lg sm:text-xl">👑</span>
+              <p className="text-yellow-400 text-[10px] sm:text-[11px] font-bold mt-1">OG</p>
+              <p className="text-gray-500 text-[8px] sm:text-[9px]">Legend</p>
             </div>
-            <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-2.5 sm:p-3 text-center">
-              <span className="text-xl sm:text-2xl">⚡</span>
-              <p className="text-cyan-400 text-[11px] sm:text-xs font-bold mt-1">Settler</p>
-              <p className="text-gray-500 text-[9px] sm:text-[10px]">Early</p>
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-2 sm:p-2.5 text-center">
+              <span className="text-lg sm:text-xl">🏆</span>
+              <p className="text-amber-400 text-[10px] sm:text-[11px] font-bold mt-1">Pioneer</p>
+              <p className="text-gray-500 text-[8px] sm:text-[9px]">Day 1</p>
             </div>
-            <div className="bg-slate-500/10 border border-slate-500/20 rounded-xl p-2.5 sm:p-3 text-center">
-              <span className="text-xl sm:text-2xl">🌐</span>
-              <p className="text-slate-400 text-[11px] sm:text-xs font-bold mt-1">Citizen</p>
-              <p className="text-gray-500 text-[9px] sm:text-[10px]">Builder</p>
+            <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-2 sm:p-2.5 text-center">
+              <span className="text-lg sm:text-xl">⚡</span>
+              <p className="text-cyan-400 text-[10px] sm:text-[11px] font-bold mt-1">Settler</p>
+              <p className="text-gray-500 text-[8px] sm:text-[9px]">Early</p>
+            </div>
+            <div className="bg-slate-500/10 border border-slate-500/20 rounded-xl p-2 sm:p-2.5 text-center">
+              <span className="text-lg sm:text-xl">🌐</span>
+              <p className="text-slate-400 text-[10px] sm:text-[11px] font-bold mt-1">Citizen</p>
+              <p className="text-gray-500 text-[8px] sm:text-[9px]">Builder</p>
             </div>
           </div>
         </div>
