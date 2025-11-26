@@ -3,6 +3,11 @@ import { UserGenesisData, UserRank, Transaction, Achievement } from '../types';
 
 const BLOCKSCOUT_API_URL = 'https://base.blockscout.com/api';
 
+// Special OG wallets (for testing/VIP)
+const OG_WALLETS = [
+  '0xEA83Fad9414A2e82Ea00Fb30e4C3e09B7E51fE4d'.toLowerCase(),
+];
+
 const calculateAchievements = (
   daysSinceJoined: number,
   rank: UserRank,
@@ -112,8 +117,11 @@ export const getBaseGenesisData = async (address: string): Promise<UserGenesisDa
     const daysSinceLaunch = Math.ceil(diffFromLaunch / (1000 * 60 * 60 * 24));
     const isPreLaunch = txDate < BASE_LAUNCH_DATE;
 
+    // Check if wallet is in special OG list
+    const isSpecialOG = OG_WALLETS.includes(address.toLowerCase());
+
     let rank = UserRank.BASE_CITIZEN;
-    if (isPreLaunch || daysSinceLaunch <= RANK_THRESHOLDS.OG_DAYS) {
+    if (isSpecialOG || isPreLaunch || daysSinceLaunch <= RANK_THRESHOLDS.OG_DAYS) {
       rank = UserRank.OG_LEGEND;
     } else if (daysSinceLaunch <= RANK_THRESHOLDS.PIONEER_DAYS) {
       rank = UserRank.GENESIS_PIONEER;
