@@ -170,9 +170,7 @@ const App: React.FC = () => {
       {/* Header */}
       <header className="relative z-10 px-4 py-3 flex items-center justify-between border-b border-white/5 bg-base-black/80 backdrop-blur-sm">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-base-blue flex items-center justify-center">
-            <span className="font-bold text-white text-sm">B</span>
-          </div>
+          <img src="/logo.jpg" alt="BaseGenesis" className="w-8 h-8 rounded-xl object-cover" />
           <span className="font-bold tracking-tight">BaseGenesis</span>
         </div>
         
