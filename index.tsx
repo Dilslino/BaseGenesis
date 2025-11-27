@@ -1,12 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { WagmiProvider } from 'wagmi';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { wagmiConfig } from './config/wagmi';
+import { Providers } from './config/onchainkit';
 import './index.css';
 import App from './App';
-
-const queryClient = new QueryClient();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -16,10 +12,8 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    </WagmiProvider>
+    <Providers>
+      <App />
+    </Providers>
   </React.StrictMode>
 );
