@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useMiniKit } from '@coinbase/onchainkit/minikit';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
 import { Heart } from 'lucide-react';
 import { Button } from './components/Button';
 import { FlexCard } from './components/FlexCard';
@@ -11,10 +11,13 @@ import { ProfileView } from './components/ProfileView';
 import { Leaderboard } from './components/Leaderboard';
 import { LoadingSequence } from './components/LoadingSequence';
 import { DonateModal } from './components/DonateModal';
+import { ConnectWalletModal } from './components/ConnectWalletModal';
 import { getBaseGenesisData } from './services/baseService';
 import { saveUserProfile, getLeaderboard, getTotalUsers, getUserRankPosition } from './services/supabase';
+import { useFarcaster } from './hooks/useFarcaster';
 import { useDonate } from './hooks/useDonate';
 import { UserGenesisData, LeaderboardEntry } from './types';
+import { RANK_EMOJI } from './constants';
 
 const App: React.FC = () => {
   // Navigation
@@ -41,35 +44,44 @@ const App: React.FC = () => {
   
   // Paste address scan (not connected)
   const [isPasteScan, setIsPasteScan] = useState(false);
-
-  // OnchainKit MiniKit hook
-  const { context, isFrameReady, setFrameReady } = useMiniKit();
   
-  // Wagmi hooks
-  const { address, isConnected: wagmiConnected } = useAccount();
-  const { connectAsync, connectors } = useConnect();
-  const { disconnect: wagmiDisconnect } = useDisconnect();
+  // Connect wallet modal
+  const [showConnectModal, setShowConnectModal] = useState(false);
+
+  // Farcaster MiniKit hook
+  const { 
+    isLoaded, 
+    isInFrame, 
+    user, 
+    walletAddress: farcasterWallet,
+    connectWallet: connectFarcasterWallet,
+    shareToWarpcast, 
+    openUrl,
+  } = useFarcaster();
+  
+  // Wagmi hooks for browser wallet connection
+  const { address: wagmiAddress, isConnected: isWagmiConnected } = useAccount();
+  const { connect: connectWagmi } = useConnect();
+  const { disconnect: disconnectWagmi } = useDisconnect();
   
   const { donate, isLoading: isDonating } = useDonate();
-  
-  // Derived state
-  const isInFrame = !!context?.client?.clientFid;
-  const user = context?.user?.fid ? { fid: context.user.fid } : null;
 
-  // Initialize MiniKit frame
+  // Auto-connect if in Farcaster frame with wallet
   useEffect(() => {
-    if (!isFrameReady) {
-      setFrameReady();
+    if (isLoaded && isInFrame && farcasterWallet) {
+      setWalletAddress(farcasterWallet);
+      setIsConnected(true);
     }
-  }, [setFrameReady, isFrameReady]);
+  }, [isLoaded, isInFrame, farcasterWallet]);
 
   // Sync Wagmi wallet state
   useEffect(() => {
-    if (wagmiConnected && address) {
-      setWalletAddress(address);
+    if (isWagmiConnected && wagmiAddress) {
+      setWalletAddress(wagmiAddress);
       setIsConnected(true);
+      setShowConnectModal(false);
     }
-  }, [wagmiConnected, address]);
+  }, [isWagmiConnected, wagmiAddress]);
 
   // Fetch leaderboard and total users on load
   useEffect(() => {
@@ -84,19 +96,31 @@ const App: React.FC = () => {
     fetchData();
   }, []);
 
-  // Connect wallet using first available connector
-  const handleConnect = async () => {
+  // Open connect wallet modal
+  const handleConnect = () => {
+    if (isInFrame) {
+      // In Farcaster frame, directly connect with Farcaster wallet
+      handleConnectFarcaster();
+    } else {
+      // Outside frame, show modal with options
+      setShowConnectModal(true);
+    }
+  };
+
+  // Connect with Farcaster wallet
+  const handleConnectFarcaster = async () => {
     setIsConnecting(true);
     setScanError(null);
     
     try {
-      const connector = connectors[0];
-      if (connector) {
-        const result = await connectAsync({ connector });
-        if (result.accounts[0]) {
-          setWalletAddress(result.accounts[0]);
-          setIsConnected(true);
-        }
+      const address = await connectFarcasterWallet();
+      
+      if (address) {
+        setWalletAddress(address);
+        setIsConnected(true);
+        setShowConnectModal(false);
+      } else {
+        throw new Error('Failed to connect wallet');
       }
     } catch (err: any) {
       console.error('Connect error:', err);
@@ -106,9 +130,27 @@ const App: React.FC = () => {
     }
   };
 
+  // Connect with browser wallet (MetaMask, Coinbase, etc.)
+  const handleConnectWalletConnect = async () => {
+    setShowConnectModal(false);
+    setIsConnecting(true);
+    try {
+      connectWagmi({ connector: injected() });
+    } catch (err: any) {
+      console.error('Wallet connect error:', err);
+      setScanError(err.message || 'Failed to connect wallet');
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
   // Disconnect wallet
-  const handleDisconnect = () => {
-    wagmiDisconnect();
+  const handleDisconnect = async () => {
+    // Disconnect Wagmi if connected
+    if (isWagmiConnected) {
+      disconnectWagmi();
+    }
+    
     setIsConnected(false);
     setWalletAddress(null);
     setUserData(null);
@@ -183,18 +225,18 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Share profile to Warpcast
+  // Share profile to Farcaster with embeds
   const handleShare = async (text: string, url: string) => {
     if (!userData) return;
+    // Include the URL in the share text with proper embed format
     const fullText = `${text}\n\n${url}`;
-    const shareUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(fullText)}`;
-    window.open(shareUrl, '_blank');
+    await shareToWarpcast(fullText);
   };
 
   // View on Basescan
   const handleViewBasescan = () => {
     if (userData?.firstTxHash) {
-      window.open(`https://basescan.org/tx/${userData.firstTxHash}`, '_blank');
+      openUrl(`https://basescan.org/tx/${userData.firstTxHash}`);
     }
   };
 
@@ -208,15 +250,7 @@ const App: React.FC = () => {
     return txHash;
   };
 
-  // Loading screen - show briefly while frame initializes
-  const [isLoaded, setIsLoaded] = useState(false);
-  
-  useEffect(() => {
-    // Short delay to allow frame to initialize
-    const timer = setTimeout(() => setIsLoaded(true), 500);
-    return () => clearTimeout(timer);
-  }, []);
-
+  // Loading screen
   if (!isLoaded) {
     return (
       <div className="w-full min-h-screen max-w-[424px] mx-auto bg-base-black text-white flex items-center justify-center">
@@ -389,6 +423,16 @@ const App: React.FC = () => {
         onClose={() => setShowDonateModal(false)}
         onDonate={handleDonate}
         isLoading={isDonating}
+      />
+
+      {/* Connect Wallet Modal */}
+      <ConnectWalletModal
+        isOpen={showConnectModal}
+        onClose={() => setShowConnectModal(false)}
+        onConnectFarcaster={handleConnectFarcaster}
+        onConnectWalletConnect={handleConnectWalletConnect}
+        isConnecting={isConnecting}
+        isInFrame={isInFrame}
       />
     </div>
   );

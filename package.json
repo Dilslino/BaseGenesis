@@ -9,15 +9,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@coinbase/onchainkit": "^0.38.5",
+    "@farcaster/frame-sdk": "^0.1.12",
+    "@farcaster/quick-auth": "^0.0.8",
+    "@reown/appkit": "^1.6.8",
+    "@reown/appkit-adapter-wagmi": "^1.6.8",
     "@supabase/supabase-js": "^2.84.0",
     "@tailwindcss/postcss": "^4.1.17",
     "@tailwindcss/vite": "^4.1.17",
+    "@tanstack/react-query": "5.62.8",
+    "@web3modal/wagmi": "^5.1.11",
     "lucide-react": "^0.554.0",
+    "next": "^16.0.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "viem": "^2.40.2",
-    "wagmi": "^2.14.16"
+    "wagmi": "^3.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
