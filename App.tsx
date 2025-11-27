@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useAppKit, useAppKitAccount, useDisconnect } from '@reown/appkit/react';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
 import { Heart } from 'lucide-react';
 import { Button } from './components/Button';
 import { FlexCard } from './components/FlexCard';
@@ -58,10 +59,10 @@ const App: React.FC = () => {
     openUrl,
   } = useFarcaster();
   
-  // WalletConnect hooks
-  const { open: openAppKit } = useAppKit();
-  const { address: appKitAddress, isConnected: isAppKitConnected } = useAppKitAccount();
-  const { disconnect: disconnectAppKit } = useDisconnect();
+  // Wagmi hooks for browser wallet connection
+  const { address: wagmiAddress, isConnected: isWagmiConnected } = useAccount();
+  const { connect: connectWagmi } = useConnect();
+  const { disconnect: disconnectWagmi } = useDisconnect();
   
   const { donate, isLoading: isDonating } = useDonate();
 
@@ -73,14 +74,14 @@ const App: React.FC = () => {
     }
   }, [isLoaded, isInFrame, farcasterWallet]);
 
-  // Sync WalletConnect state
+  // Sync Wagmi wallet state
   useEffect(() => {
-    if (isAppKitConnected && appKitAddress) {
-      setWalletAddress(appKitAddress);
+    if (isWagmiConnected && wagmiAddress) {
+      setWalletAddress(wagmiAddress);
       setIsConnected(true);
       setShowConnectModal(false);
     }
-  }, [isAppKitConnected, appKitAddress]);
+  }, [isWagmiConnected, wagmiAddress]);
 
   // Fetch leaderboard and total users on load
   useEffect(() => {
@@ -129,17 +130,25 @@ const App: React.FC = () => {
     }
   };
 
-  // Connect with WalletConnect
+  // Connect with browser wallet (MetaMask, Coinbase, etc.)
   const handleConnectWalletConnect = async () => {
     setShowConnectModal(false);
-    await openAppKit();
+    setIsConnecting(true);
+    try {
+      connectWagmi({ connector: injected() });
+    } catch (err: any) {
+      console.error('Wallet connect error:', err);
+      setScanError(err.message || 'Failed to connect wallet');
+    } finally {
+      setIsConnecting(false);
+    }
   };
 
   // Disconnect wallet
   const handleDisconnect = async () => {
-    // Disconnect WalletConnect if connected
-    if (isAppKitConnected) {
-      await disconnectAppKit();
+    // Disconnect Wagmi if connected
+    if (isWagmiConnected) {
+      disconnectWagmi();
     }
     
     setIsConnected(false);

@@ -77,14 +77,14 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({
             <div className="flex-1 h-px bg-white/10"></div>
           </div>
           
-          {/* WalletConnect Button */}
+          {/* Browser Wallet Button */}
           <button
             onClick={onConnectWalletConnect}
             disabled={isConnecting}
             className="w-full py-3.5 px-4 rounded-xl font-semibold text-white
-              bg-gradient-to-r from-blue-600 to-blue-800
-              hover:from-blue-500 hover:to-blue-700
-              border border-blue-500/30 hover:border-blue-500/50
+              bg-gradient-to-r from-orange-500 to-orange-700
+              hover:from-orange-400 hover:to-orange-600
+              border border-orange-500/30 hover:border-orange-500/50
               transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
               flex items-center justify-center gap-3
               disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
@@ -96,10 +96,12 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({
               </span>
             ) : (
               <>
-                <svg className="w-5 h-5" viewBox="0 0 300 185" fill="currentColor">
-                  <path d="M61.4385 36.2562C104.408 -5.41873 175.592 -5.41873 218.562 36.2562L223.823 41.3543C226.059 43.5245 226.059 47.0736 223.823 49.2438L205.647 66.7728C204.529 67.8579 202.735 67.8579 201.617 66.7728L194.341 59.6956C164.578 30.7988 115.422 30.7988 85.6593 59.6956L77.8235 67.3314C76.7053 68.4165 74.9111 68.4165 73.7929 67.3314L55.6176 49.8024C53.3815 47.6322 53.3815 44.0831 55.6176 41.9129L61.4385 36.2562ZM254.849 71.4075L271.006 87.0066C273.242 89.1768 273.242 92.7259 271.006 94.8961L197.528 166.244C195.292 168.414 191.704 168.414 189.468 166.244L136.022 114.057C135.463 113.514 134.566 113.514 134.007 114.057L80.5616 166.244C78.3255 168.414 74.7373 168.414 72.5012 166.244L-1.00628 94.8961C-3.24238 92.7259 -3.24238 89.1768 -1.00628 87.0066L15.1508 71.4075C17.3869 69.2373 20.9751 69.2373 23.2112 71.4075L76.6568 123.595C77.2162 124.137 78.1131 124.137 78.6726 123.595L132.118 71.4075C134.354 69.2373 137.942 69.2373 140.178 71.4075L193.624 123.595C194.183 124.137 195.08 124.137 195.639 123.595L249.085 71.4075C251.321 69.2373 254.613 69.2373 254.849 71.4075Z"/>
+                <svg className="w-5 h-5" viewBox="0 0 318.6 318.6" fill="currentColor">
+                  <path d="M274.1 35.5l-99.5 73.9L193 65.8z" fill="#E2761B"/>
+                  <path d="M44.4 35.5l98.7 74.6-17.5-44.3zm193.9 171.3l-26.5 40.6 56.7 15.6 16.3-55.3zm-204.4.9L50.1 263l56.7-15.6-26.5-40.6z" fill="#E4761B"/>
+                  <path d="M103.6 138.2l-15.8 23.9 56.3 2.5-2-60.5zm111.3 0l-39-34.8-1.3 61.2 56.2-2.5zM106.8 247.4l33.8-16.5-29.2-22.8zm71.1-16.5l33.9 16.5-4.7-39.3z" fill="#E4761B"/>
                 </svg>
-                WalletConnect
+                Browser Wallet
               </>
             )}
           </button>
@@ -109,7 +111,7 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({
             <p className="text-gray-500 text-xs text-center">
               {isInFrame 
                 ? 'Use Farcaster Wallet for the best experience'
-                : 'WalletConnect works with 300+ wallets'}
+                : 'Connect with MetaMask, Coinbase Wallet, or other browser wallets'}
             </p>
           </div>
         </div>
