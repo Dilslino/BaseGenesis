@@ -319,7 +319,7 @@ const App: React.FC = () => {
             {/* Profile Info */}
             <ProfileView
               userData={userData}
-              onShare={handleShare}
+              onShareFarcaster={handleShare}
               onViewBasescan={handleViewBasescan}
             />
 
