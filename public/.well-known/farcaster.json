@@ -3,6 +3,9 @@
     "header": "eyJmaWQiOjIzODIzNiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweEEyQTc2RDhCNkE1MWQxNEM5MTQ1RjdFZkY4OTI0Qzg5MTZlMjFDODQifQ",
     "payload": "eyJkb21haW4iOiJiYXNlZ2VuZXNpcy52ZXJjZWwuYXBwIn0",
     "signature": "jsWnxdPBEIiNefxV3mklixw03yMnwEhT+NSSjOGD+q4Et48Xsq21lvTDJoTmVYDmTfXXlx4pkcMbtZ+i3R70vRw="
+    },
+  "baseBuilder": {
+    "ownerAddress": "0x..."
   },
   "miniapp": {
     "version": "1",
