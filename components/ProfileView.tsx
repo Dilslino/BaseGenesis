@@ -7,7 +7,7 @@ import { Button } from './Button';
 
 interface ProfileViewProps {
   userData: UserGenesisData;
-  onShareFarcaster: () => void;
+  onShareFarcaster: (text: string, url: string) => void;
   onViewBasescan: () => void;
 }
 
@@ -33,7 +33,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ userData, onShareFarca
   };
 
   const handleShareFarcaster = () => {
-    onShareFarcaster();
+    onShareFarcaster(shareText, shareUrl);
     setShowShareModal(false);
   };
 
@@ -152,11 +152,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ userData, onShareFarca
                   hover:from-gray-700 hover:to-gray-800
                   border border-white/10 hover:border-white/20
                   transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
-                  flex items-center justify-center gap-3"
+                  flex items-center justify-center"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                </svg>
                 Share on X (Twitter)
               </button>
               
@@ -168,11 +165,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ userData, onShareFarca
                   hover:from-purple-500 hover:to-purple-700
                   border border-purple-500/30 hover:border-purple-500/50
                   transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
-                  flex items-center justify-center gap-3"
+                  flex items-center justify-center"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M3 7.5V3h18v4.5h-3.5V21h-4V7.5h-3V21H6.5V7.5H3z"/>
-                </svg>
                 Share on Farcaster
               </button>
 

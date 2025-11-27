@@ -14,7 +14,7 @@ import { saveUserProfile, getLeaderboard, getTotalUsers, getUserRankPosition } f
 import { useFarcaster } from './hooks/useFarcaster';
 import { useDonate } from './hooks/useDonate';
 import { UserGenesisData, LeaderboardEntry } from './types';
-import { SHARE_MESSAGES, RANK_EMOJI } from './constants';
+import { RANK_EMOJI } from './constants';
 
 const App: React.FC = () => {
   // Navigation
@@ -174,12 +174,12 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Share profile
-  const handleShare = async () => {
+  // Share profile to Farcaster with embeds
+  const handleShare = async (text: string, url: string) => {
     if (!userData) return;
-    const baseMessage = SHARE_MESSAGES[userData.rank];
-    const text = `${baseMessage}\n\n${RANK_EMOJI[userData.rank]} ${userData.daysSinceJoined} days on Base\n\nCheck yours:`;
-    await shareToWarpcast(text);
+    // Include the URL in the share text with proper embed format
+    const fullText = `${text}\n\n${url}`;
+    await shareToWarpcast(fullText);
   };
 
   // View on Basescan
