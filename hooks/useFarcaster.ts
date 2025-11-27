@@ -2,12 +2,23 @@ import { useState, useEffect, useCallback } from 'react';
 import sdk from '@farcaster/frame-sdk';
 import { FarcasterUser } from '../types';
 
+interface QuickAuthState {
+  token: string | null;
+  isAuthenticated: boolean;
+}
+
 interface UseFarcasterResult {
   isLoaded: boolean;
   isInFrame: boolean;
   user: FarcasterUser | null;
   walletAddress: string | null;
   error: string | null;
+  // Quick Auth
+  authToken: string | null;
+  isAuthenticated: boolean;
+  signIn: () => Promise<boolean>;
+  signOut: () => void;
+  // Actions
   connectWallet: () => Promise<string | null>;
   openUrl: (url: string) => Promise<void>;
   shareToWarpcast: (text: string) => Promise<void>;
@@ -20,6 +31,12 @@ export const useFarcaster = (): UseFarcasterResult => {
   const [user, setUser] = useState<FarcasterUser | null>(null);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  // Quick Auth state
+  const [authState, setAuthState] = useState<QuickAuthState>({
+    token: null,
+    isAuthenticated: false,
+  });
 
   useEffect(() => {
     const initFarcaster = async () => {
@@ -149,12 +166,50 @@ export const useFarcaster = (): UseFarcasterResult => {
     await openUrl(shareUrl);
   }, [openUrl]);
 
+  // Quick Auth - Sign in with Farcaster
+  const signIn = useCallback(async (): Promise<boolean> => {
+    try {
+      if (!isInFrame) {
+        console.log('Quick Auth only works inside Farcaster frame');
+        return false;
+      }
+
+      // Get JWT token from Farcaster Quick Auth
+      const { token } = await sdk.experimental.quickAuth.getToken();
+      
+      setAuthState({
+        token,
+        isAuthenticated: true,
+      });
+
+      return true;
+    } catch (err: any) {
+      console.error('Quick Auth sign in error:', err);
+      setError(err.message || 'Authentication failed');
+      return false;
+    }
+  }, [isInFrame]);
+
+  // Sign out - clear auth state
+  const signOut = useCallback(() => {
+    setAuthState({
+      token: null,
+      isAuthenticated: false,
+    });
+  }, []);
+
   return {
     isLoaded,
     isInFrame,
     user,
     walletAddress,
     error,
+    // Quick Auth
+    authToken: authState.token,
+    isAuthenticated: authState.isAuthenticated,
+    signIn,
+    signOut,
+    // Actions
     connectWallet,
     openUrl,
     shareToWarpcast,
