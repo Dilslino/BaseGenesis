@@ -10,10 +10,11 @@ import { Leaderboard } from './components/Leaderboard';
 import { LoadingSequence } from './components/LoadingSequence';
 import { DonateModal } from './components/DonateModal';
 import { getBaseGenesisData } from './services/baseService';
+import { saveUserProfile, getLeaderboard, getTotalUsers, getUserRankPosition } from './services/supabase';
 import { useFarcaster } from './hooks/useFarcaster';
 import { useDonate } from './hooks/useDonate';
-import { UserGenesisData } from './types';
-import { MOCK_LEADERBOARD, SHARE_MESSAGES, RANK_EMOJI } from './constants';
+import { UserGenesisData, LeaderboardEntry } from './types';
+import { SHARE_MESSAGES, RANK_EMOJI } from './constants';
 
 const App: React.FC = () => {
   // Navigation
@@ -32,6 +33,14 @@ const App: React.FC = () => {
   // Donate state
   const [showDonateModal, setShowDonateModal] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+
+  // Leaderboard state
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [userRankPosition, setUserRankPosition] = useState<number | null>(null);
+  
+  // Paste address scan (not connected)
+  const [isPasteScan, setIsPasteScan] = useState(false);
 
   // Farcaster MiniKit hook
   const { 
@@ -53,6 +62,19 @@ const App: React.FC = () => {
       setIsConnected(true);
     }
   }, [isLoaded, isInFrame, farcasterWallet]);
+
+  // Fetch leaderboard and total users on load
+  useEffect(() => {
+    const fetchData = async () => {
+      const [leaderboard, total] = await Promise.all([
+        getLeaderboard(50),
+        getTotalUsers()
+      ]);
+      setLeaderboardData(leaderboard);
+      setTotalUsers(total);
+    };
+    fetchData();
+  }, []);
 
   // Connect wallet using Farcaster MiniKit or MetaMask
   const handleConnect = async () => {
@@ -81,30 +103,76 @@ const App: React.FC = () => {
     setIsConnected(false);
     setWalletAddress(null);
     setUserData(null);
+    setIsPasteScan(false);
+    setUserRankPosition(null);
     setActiveTab('home');
   };
 
-  // Start scan
+  // Start scan (connected wallet - saves to database)
   const handleStartScan = useCallback(async () => {
     if (!walletAddress) return;
     
     setIsScanning(true);
     setScanError(null);
+    setIsPasteScan(false);
 
     try {
       await new Promise(r => setTimeout(r, 2000)); // Loading effect
       const data = await getBaseGenesisData(walletAddress);
       setUserData(data);
+      
+      // Save to Supabase (only for connected wallets)
+      if (isConnected) {
+        await saveUserProfile(data, {
+          username: user?.username,
+          pfpUrl: user?.pfpUrl,
+          fid: user?.fid,
+        });
+        
+        // Refresh leaderboard and get user position
+        const [leaderboard, total, position] = await Promise.all([
+          getLeaderboard(50),
+          getTotalUsers(),
+          getUserRankPosition(walletAddress)
+        ]);
+        setLeaderboardData(leaderboard);
+        setTotalUsers(total);
+        setUserRankPosition(position);
+      }
+      
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
-      setActiveTab('profile'); // Go to profile after scan
+      setActiveTab('profile');
     } catch (err: any) {
       console.error('Scan error:', err);
       setScanError(err.message || 'Failed to analyze wallet');
     } finally {
       setIsScanning(false);
     }
-  }, [walletAddress]);
+  }, [walletAddress, isConnected, user]);
+
+  // Paste address scan (not connected - does NOT save to database)
+  const handlePasteAddressScan = useCallback(async (address: string) => {
+    setIsScanning(true);
+    setScanError(null);
+    setIsPasteScan(true);
+    setActiveTab('scan');
+
+    try {
+      await new Promise(r => setTimeout(r, 2000)); // Loading effect
+      const data = await getBaseGenesisData(address);
+      setUserData(data);
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+      setActiveTab('profile');
+    } catch (err: any) {
+      console.error('Scan error:', err);
+      setScanError(err.message || 'Failed to analyze wallet');
+      setActiveTab('home');
+    } finally {
+      setIsScanning(false);
+    }
+  }, []);
 
   // Share profile
   const handleShare = async () => {
@@ -203,9 +271,11 @@ const App: React.FC = () => {
             isInFrame={isInFrame}
             username={user?.username}
             pfpUrl={user?.pfpUrl}
+            totalUsers={totalUsers}
             onConnect={handleConnect}
             onDisconnect={handleDisconnect}
             onNavigateToScan={() => setActiveTab('scan')}
+            onPasteAddressScan={handlePasteAddressScan}
           />
         )}
 
@@ -223,8 +293,8 @@ const App: React.FC = () => {
         {/* Leaderboard Tab */}
         {activeTab === 'leaderboard' && (
           <Leaderboard
-            entries={MOCK_LEADERBOARD}
-            userRank={userData ? 42069 : undefined}
+            entries={leaderboardData}
+            userRank={userRankPosition || undefined}
             userAddress={walletAddress || undefined}
           />
         )}
@@ -232,6 +302,15 @@ const App: React.FC = () => {
         {/* Profile Tab */}
         {activeTab === 'profile' && userData && (
           <div className="flex flex-col h-full space-y-4">
+            {/* Paste Scan Notice */}
+            {isPasteScan && (
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 text-center">
+                <p className="text-yellow-400 text-xs">
+                  This is a preview scan. Connect wallet to save to leaderboard.
+                </p>
+              </div>
+            )}
+
             {/* Card */}
             <div className="flex justify-center">
               <FlexCard data={userData} />
