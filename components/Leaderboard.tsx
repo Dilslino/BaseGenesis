@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Trophy, Crown, Star, Medal, Award } from 'lucide-react';
+import { Trophy, Crown, Star, Medal, Award, Gem, Flame, Zap, Shield } from 'lucide-react';
 import { LeaderboardEntry, UserRank } from '../types';
 import { RANK_BADGE_COLORS, RANK_EMOJI } from '../constants';
 
@@ -8,6 +8,96 @@ interface LeaderboardProps {
   userRank?: number;
   userAddress?: string;
 }
+
+// Badge configurations for different rank tiers
+const getBadgeConfig = (position: number) => {
+  // Top 1 - Diamond Champion
+  if (position === 1) {
+    return {
+      icon: <Crown className="w-5 h-5 text-yellow-300" />,
+      bg: 'bg-gradient-to-br from-yellow-500/30 via-amber-500/20 to-orange-500/30',
+      border: 'border-yellow-500/50',
+      glow: 'shadow-[0_0_15px_rgba(234,179,8,0.4)]',
+      label: '👑',
+      title: 'Champion'
+    };
+  }
+  // Top 2 - Platinum
+  if (position === 2) {
+    return {
+      icon: <Gem className="w-4 h-4 text-slate-200" />,
+      bg: 'bg-gradient-to-br from-slate-400/20 via-gray-300/20 to-slate-500/20',
+      border: 'border-slate-400/50',
+      glow: 'shadow-[0_0_10px_rgba(148,163,184,0.3)]',
+      label: '💎',
+      title: 'Platinum'
+    };
+  }
+  // Top 3 - Gold
+  if (position === 3) {
+    return {
+      icon: <Medal className="w-4 h-4 text-amber-500" />,
+      bg: 'bg-gradient-to-br from-amber-600/20 via-orange-500/20 to-amber-700/20',
+      border: 'border-amber-600/50',
+      glow: 'shadow-[0_0_8px_rgba(217,119,6,0.3)]',
+      label: '🥉',
+      title: 'Gold'
+    };
+  }
+  // Top 4-5 - Silver Elite
+  if (position <= 5) {
+    return {
+      icon: <Award className="w-4 h-4 text-gray-400" />,
+      bg: 'bg-gray-500/10',
+      border: 'border-gray-500/30',
+      glow: '',
+      label: '🥈',
+      title: 'Silver'
+    };
+  }
+  // Top 6-10 - Bronze
+  if (position <= 10) {
+    return {
+      icon: <Flame className="w-4 h-4 text-orange-400" />,
+      bg: 'bg-orange-500/10',
+      border: 'border-orange-500/20',
+      glow: '',
+      label: '🔥',
+      title: 'Bronze'
+    };
+  }
+  // Top 11-25 - Rising Star
+  if (position <= 25) {
+    return {
+      icon: <Zap className="w-3.5 h-3.5 text-cyan-400" />,
+      bg: 'bg-cyan-500/10',
+      border: 'border-cyan-500/20',
+      glow: '',
+      label: '⚡',
+      title: 'Rising'
+    };
+  }
+  // Top 26-50 - Verified
+  if (position <= 50) {
+    return {
+      icon: <Shield className="w-3.5 h-3.5 text-blue-400" />,
+      bg: 'bg-blue-500/10',
+      border: 'border-blue-500/20',
+      glow: '',
+      label: '🛡️',
+      title: 'Verified'
+    };
+  }
+  // Rest - Standard
+  return {
+    icon: <span className="text-xs font-bold text-gray-500">#{position}</span>,
+    bg: 'bg-white/5',
+    border: 'border-white/5',
+    glow: '',
+    label: '',
+    title: ''
+  };
+};
 
 export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, userAddress }) => {
   // Sort by days (descending) and then by rank weight
@@ -28,13 +118,6 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
     });
   }, [entries]);
 
-  const getRankIcon = (idx: number) => {
-    if (idx === 0) return <Crown className="w-4 h-4 text-yellow-400" />;
-    if (idx === 1) return <Medal className="w-4 h-4 text-gray-300" />;
-    if (idx === 2) return <Award className="w-4 h-4 text-amber-600" />;
-    return <span className="text-xs font-bold text-gray-500">#{idx + 1}</span>;
-  };
-
   return (
     <div className="flex flex-col h-full animate-fade-in">
       {/* Header */}
@@ -51,6 +134,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
       {/* List */}
       <div className="flex-grow overflow-y-auto space-y-2 pr-1 -mr-1">
         {sortedEntries.map((entry, idx) => {
+          const position = idx + 1;
+          const badge = getBadgeConfig(position);
           const isCurrentUser = userAddress && entry.address.toLowerCase().includes(userAddress.slice(-4).toLowerCase());
           
           return (
@@ -58,28 +143,26 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
               key={`${entry.address}-${idx}`}
               className={`
                 relative p-3 rounded-xl border transition-all duration-300
-                ${idx < 3 
-                  ? 'bg-gradient-to-r from-white/5 to-transparent border-white/10' 
-                  : 'bg-white/[0.02] border-white/5'
-                }
-                ${isCurrentUser ? 'ring-2 ring-base-blue border-base-blue/50' : ''}
+                ${badge.bg} ${badge.border} ${badge.glow}
+                ${isCurrentUser ? 'ring-2 ring-base-blue' : ''}
               `}
             >
               <div className="flex items-center gap-3">
-                {/* Rank Position */}
+                {/* Rank Position Badge */}
                 <div className={`
-                  w-9 h-9 rounded-full flex items-center justify-center
-                  ${idx === 0 ? 'bg-yellow-500/20' : ''}
-                  ${idx === 1 ? 'bg-gray-400/20' : ''}
-                  ${idx === 2 ? 'bg-amber-700/20' : ''}
-                  ${idx > 2 ? 'bg-white/5' : ''}
+                  w-10 h-10 rounded-xl flex flex-col items-center justify-center
+                  ${position <= 3 ? 'bg-black/20' : 'bg-white/5'}
                 `}>
-                  {getRankIcon(idx)}
+                  {badge.icon}
+                  {position <= 10 && badge.title && (
+                    <span className="text-[7px] text-gray-400 mt-0.5">{badge.title}</span>
+                  )}
                 </div>
 
                 {/* Profile */}
                 <div className="flex-grow min-w-0">
                   <div className="flex items-center gap-1.5">
+                    {position <= 5 && <span className="text-sm">{badge.label}</span>}
                     <span className="font-semibold text-sm truncate">
                       {entry.name}
                       {isCurrentUser && <span className="text-base-blue ml-1">(You)</span>}
@@ -88,6 +171,11 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
                   </div>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-[10px] text-gray-500 font-mono">{entry.address}</span>
+                    {position <= 3 && (
+                      <span className="text-[8px] px-1.5 py-0.5 bg-white/10 rounded text-gray-400">
+                        TOP {position}
+                      </span>
+                    )}
                   </div>
                 </div>
 
