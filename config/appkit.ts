@@ -5,10 +5,11 @@ import { QueryClient } from '@tanstack/react-query';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 
 // Get projectId from https://cloud.reown.com
-export const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '5d5a5f2e6fb21c34d112d52f97ccff98';
+// Create a free project at https://cloud.reown.com and add your domain
+export const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 
 if (!projectId) {
-  throw new Error('WalletConnect Project ID is not defined');
+  console.warn('WalletConnect Project ID is not defined. WalletConnect will not work.');
 }
 
 // Setup queryClient
@@ -25,27 +26,29 @@ const metadata = {
 // Create Wagmi Adapter with Base chain only
 export const wagmiAdapter = new WagmiAdapter({
   networks: [base],
-  projectId,
+  projectId: projectId || 'placeholder',
   ssr: false,
 });
 
-// Create the AppKit modal
-createAppKit({
-  adapters: [wagmiAdapter],
-  networks: [base],
-  projectId,
-  metadata,
-  features: {
-    analytics: true,
-    email: false,
-    socials: false,
-  },
-  themeMode: 'dark',
-  themeVariables: {
-    '--w3m-color-mix': '#0052FF',
-    '--w3m-accent': '#0052FF',
-    '--w3m-border-radius-master': '12px',
-  }
-});
+// Create the AppKit modal only if projectId exists
+if (projectId) {
+  createAppKit({
+    adapters: [wagmiAdapter],
+    networks: [base],
+    projectId,
+    metadata,
+    features: {
+      analytics: true,
+      email: false,
+      socials: false,
+    },
+    themeMode: 'dark',
+    themeVariables: {
+      '--w3m-color-mix': '#0052FF',
+      '--w3m-accent': '#0052FF',
+      '--w3m-border-radius-master': '12px',
+    }
+  });
+}
 
 export const wagmiConfig = wagmiAdapter.wagmiConfig;
