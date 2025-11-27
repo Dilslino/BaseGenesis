@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { parseEther, parseUnits, encodeFunctionData } from 'viem';
-import { sdk } from '@farcaster/miniapp-sdk';
+import sdk from '@farcaster/frame-sdk';
 
 const CREATOR_WALLET = '0xEA83Fad9414A2e82Ea00Fb30e4C3e09B7E51fE4d' as const;
 

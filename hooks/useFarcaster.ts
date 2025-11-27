@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { sdk } from '@farcaster/miniapp-sdk';
+import sdk from '@farcaster/frame-sdk';
 import { FarcasterUser } from '../types';
 
 interface UseFarcasterResult {
@@ -24,7 +24,7 @@ export const useFarcaster = (): UseFarcasterResult => {
   useEffect(() => {
     const initFarcaster = async () => {
       try {
-        const context = sdk.context;
+        const context = await sdk.context;
         
         if (context?.user) {
           setIsInFrame(true);
@@ -35,19 +35,17 @@ export const useFarcaster = (): UseFarcasterResult => {
             pfpUrl: context.user.pfpUrl,
           });
 
-          // Try to get wallet address from connected accounts
-          if (context.user.connectedAccounts) {
-            const ethAccount = context.user.connectedAccounts.find(
-              (acc: any) => acc.chain === 'ethereum'
-            );
-            if (ethAccount?.address) {
-              setWalletAddress(ethAccount.address);
-            }
+          // Try to get wallet address from verified addresses or custody
+          const ethAddresses = context.user.verifiedAddresses?.ethAddresses;
+          if (ethAddresses && ethAddresses.length > 0) {
+            setWalletAddress(ethAddresses[0]);
+          } else if (context.user.custodyAddress) {
+            setWalletAddress(context.user.custodyAddress);
           }
         }
         
         // Signal ready to Farcaster
-        sdk.actions.ready();
+        await sdk.actions.ready();
         setIsLoaded(true);
       } catch (err) {
         console.log('Not in Farcaster frame or SDK error:', err);
