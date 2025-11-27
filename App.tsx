@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useAppKit, useAppKitAccount, useDisconnect } from '@reown/appkit/react';
 import { Heart } from 'lucide-react';
 import { Button } from './components/Button';
 import { FlexCard } from './components/FlexCard';
@@ -9,6 +10,7 @@ import { ProfileView } from './components/ProfileView';
 import { Leaderboard } from './components/Leaderboard';
 import { LoadingSequence } from './components/LoadingSequence';
 import { DonateModal } from './components/DonateModal';
+import { ConnectWalletModal } from './components/ConnectWalletModal';
 import { getBaseGenesisData } from './services/baseService';
 import { saveUserProfile, getLeaderboard, getTotalUsers, getUserRankPosition } from './services/supabase';
 import { useFarcaster } from './hooks/useFarcaster';
@@ -41,6 +43,9 @@ const App: React.FC = () => {
   
   // Paste address scan (not connected)
   const [isPasteScan, setIsPasteScan] = useState(false);
+  
+  // Connect wallet modal
+  const [showConnectModal, setShowConnectModal] = useState(false);
 
   // Farcaster MiniKit hook
   const { 
@@ -48,10 +53,15 @@ const App: React.FC = () => {
     isInFrame, 
     user, 
     walletAddress: farcasterWallet,
-    connectWallet,
+    connectWallet: connectFarcasterWallet,
     shareToWarpcast, 
     openUrl,
   } = useFarcaster();
+  
+  // WalletConnect hooks
+  const { open: openAppKit } = useAppKit();
+  const { address: appKitAddress, isConnected: isAppKitConnected } = useAppKitAccount();
+  const { disconnect: disconnectAppKit } = useDisconnect();
   
   const { donate, isLoading: isDonating } = useDonate();
 
@@ -62,6 +72,15 @@ const App: React.FC = () => {
       setIsConnected(true);
     }
   }, [isLoaded, isInFrame, farcasterWallet]);
+
+  // Sync WalletConnect state
+  useEffect(() => {
+    if (isAppKitConnected && appKitAddress) {
+      setWalletAddress(appKitAddress);
+      setIsConnected(true);
+      setShowConnectModal(false);
+    }
+  }, [isAppKitConnected, appKitAddress]);
 
   // Fetch leaderboard and total users on load
   useEffect(() => {
@@ -76,17 +95,29 @@ const App: React.FC = () => {
     fetchData();
   }, []);
 
-  // Connect wallet using Farcaster MiniKit or MetaMask
-  const handleConnect = async () => {
+  // Open connect wallet modal
+  const handleConnect = () => {
+    if (isInFrame) {
+      // In Farcaster frame, directly connect with Farcaster wallet
+      handleConnectFarcaster();
+    } else {
+      // Outside frame, show modal with options
+      setShowConnectModal(true);
+    }
+  };
+
+  // Connect with Farcaster wallet
+  const handleConnectFarcaster = async () => {
     setIsConnecting(true);
     setScanError(null);
     
     try {
-      const address = await connectWallet();
+      const address = await connectFarcasterWallet();
       
       if (address) {
         setWalletAddress(address);
         setIsConnected(true);
+        setShowConnectModal(false);
       } else {
         throw new Error('Failed to connect wallet');
       }
@@ -98,8 +129,19 @@ const App: React.FC = () => {
     }
   };
 
+  // Connect with WalletConnect
+  const handleConnectWalletConnect = async () => {
+    setShowConnectModal(false);
+    await openAppKit();
+  };
+
   // Disconnect wallet
-  const handleDisconnect = () => {
+  const handleDisconnect = async () => {
+    // Disconnect WalletConnect if connected
+    if (isAppKitConnected) {
+      await disconnectAppKit();
+    }
+    
     setIsConnected(false);
     setWalletAddress(null);
     setUserData(null);
@@ -372,6 +414,16 @@ const App: React.FC = () => {
         onClose={() => setShowDonateModal(false)}
         onDonate={handleDonate}
         isLoading={isDonating}
+      />
+
+      {/* Connect Wallet Modal */}
+      <ConnectWalletModal
+        isOpen={showConnectModal}
+        onClose={() => setShowConnectModal(false)}
+        onConnectFarcaster={handleConnectFarcaster}
+        onConnectWalletConnect={handleConnectWalletConnect}
+        isConnecting={isConnecting}
+        isInFrame={isInFrame}
       />
     </div>
   );
