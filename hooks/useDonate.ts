@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { parseEther, parseUnits, encodeFunctionData } from 'viem';
-import sdk from '@farcaster/frame-sdk';
+import { sdk } from '@farcaster/miniapp-sdk';
 
 const CREATOR_WALLET = '0xEA83Fad9414A2e82Ea00Fb30e4C3e09B7E51fE4d' as const;
 
@@ -40,7 +40,7 @@ export const useDonate = (): UseDonateResult => {
     setError(null);
 
     try {
-      const provider = isInFrame ? sdk.wallet.ethProvider : window.ethereum;
+      const provider = (isInFrame && sdk.wallet) ? sdk.wallet.ethProvider : window.ethereum;
       
       if (!provider) {
         throw new Error('No wallet provider available');
