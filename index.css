@@ -135,11 +135,53 @@
   --animate-crown-float: crown-float 2s ease-in-out infinite;
 }
 
+/* Reown AppKit / Web3Modal z-index fix */
+:root {
+  --w3m-z-index: 99999 !important;
+  --wcm-z-index: 99999 !important;
+}
+
+/* Force Reown modal to be on top of everything */
+w3m-modal,
+wcm-modal,
+appkit-modal,
+[data-w3m-modal],
+[data-wcm-modal],
+.w3m-overlay,
+.wcm-overlay {
+  z-index: 99999 !important;
+  position: fixed !important;
+}
+
+/* Ensure modal backdrop covers everything */
+w3m-modal::part(overlay),
+wcm-modal::part(overlay),
+appkit-modal::part(overlay) {
+  z-index: 99998 !important;
+  position: fixed !important;
+  inset: 0 !important;
+}
+
+/* Fix for modal container */
+w3m-modal::part(container),
+wcm-modal::part(container),
+appkit-modal::part(container) {
+  z-index: 99999 !important;
+}
+
 @layer base {
   body {
     background-color: #020205;
     color: #ffffff;
     -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Prevent modal clipping from overflow hidden parents */
+  #__next,
+  #root,
+  main,
+  .app-container {
+    isolation: isolate;
   }
 
   /* Custom scrollbar */
