@@ -17,10 +17,10 @@ const calculateAchievements = (
         unlocked = true;
         break;
       case 'pioneer':
-        unlocked = rank === UserRank.GENESIS_PIONEER;
+        unlocked = rank === UserRank.OG_LEGEND;
         break;
       case 'early_bird':
-        unlocked = rank === UserRank.GENESIS_PIONEER || rank === UserRank.EARLY_SETTLER;
+        unlocked = rank === UserRank.OG_LEGEND || rank === UserRank.GENESIS_PIONEER || rank === UserRank.EARLY_SETTLER;
         break;
       case 'tx_10':
         unlocked = txCount >= 10;
