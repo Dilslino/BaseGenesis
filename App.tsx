@@ -12,7 +12,7 @@ import { LoadingSequence } from './components/LoadingSequence';
 import { DonateModal } from './components/DonateModal';
 import { ConnectWalletModal } from './components/ConnectWalletModal';
 import { getBaseGenesisData } from './services/baseService';
-import { saveUserProfile, getLeaderboard, getTotalUsers, getUserRankPosition } from './services/supabase';
+import { saveUserProfile, getLeaderboard, getTotalUsers, getUserRankPosition, saveScan } from './services/supabase';
 import { useFarcaster } from './hooks/useFarcaster';
 import { useDonate } from './hooks/useDonate';
 import { UserGenesisData, LeaderboardEntry } from './types';
@@ -163,6 +163,9 @@ const App: React.FC = () => {
       const data = await getBaseGenesisData(walletAddress);
       setUserData(data);
       
+      // Save scan to trigger real-time counter update
+      await saveScan(walletAddress);
+      
       // Save to Supabase (only for connected wallets)
       if (isConnected) {
         await saveUserProfile(data, {
@@ -193,7 +196,7 @@ const App: React.FC = () => {
     }
   }, [walletAddress, isConnected, user]);
 
-  // Paste address scan (not connected - does NOT save to database)
+  // Paste address scan (not connected - does NOT save to database but counts scan)
   const handlePasteAddressScan = useCallback(async (address: string) => {
     setIsScanning(true);
     setScanError(null);
@@ -204,6 +207,10 @@ const App: React.FC = () => {
       await new Promise(r => setTimeout(r, 2000)); // Loading effect
       const data = await getBaseGenesisData(address);
       setUserData(data);
+      
+      // Save scan to trigger real-time counter update (even for paste scans)
+      await saveScan(address);
+      
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
       setActiveTab('profile');

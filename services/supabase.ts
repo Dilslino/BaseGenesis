@@ -129,3 +129,77 @@ export const getUserRankPosition = async (address: string): Promise<number | nul
     return null;
   }
 };
+
+// ============================================
+// Real-time Scan Counter Functions
+// ============================================
+
+// Save a scan record (called when user scans wallet)
+export const saveScan = async (walletAddress: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('scans')
+      .insert({ wallet_address: walletAddress.toLowerCase() });
+
+    if (error) {
+      console.error('Error saving scan:', error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Supabase scan save error:', err);
+    return false;
+  }
+};
+
+// Get total scans from global_stats
+export const getTotalScans = async (): Promise<number> => {
+  try {
+    const { data, error } = await supabase
+      .from('global_stats')
+      .select('total_scans')
+      .eq('id', 'main')
+      .single();
+
+    if (error) {
+      console.error('Error fetching total scans:', error);
+      // Fallback to users count
+      return await getTotalUsers();
+    }
+
+    return data?.total_scans || 0;
+  } catch (err) {
+    console.error('Supabase total scans error:', err);
+    return 0;
+  }
+};
+
+// Subscribe to real-time updates on global_stats
+export const subscribeToScanCount = (
+  onUpdate: (count: number) => void
+): (() => void) => {
+  const channel = supabase
+    .channel('global_stats_changes')
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'global_stats',
+        filter: 'id=eq.main'
+      },
+      (payload) => {
+        const newCount = payload.new?.total_scans;
+        if (typeof newCount === 'number') {
+          onUpdate(newCount);
+        }
+      }
+    )
+    .subscribe();
+
+  // Return unsubscribe function
+  return () => {
+    supabase.removeChannel(channel);
+  };
+};

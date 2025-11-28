@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Wallet, LogOut, Users, Search } from 'lucide-react';
 import { Button } from './Button';
+import { useRealtimeScanCount } from '../hooks/useRealtimeScanCount';
 
 interface HomeViewProps {
   isConnected: boolean;
@@ -60,20 +61,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   const [pasteAddress, setPasteAddress] = useState('');
   const [pasteError, setPasteError] = useState('');
-  const [scanCount, setScanCount] = useState(totalUsers || 12847);
   
-  useEffect(() => {
-    if (totalUsers > 0) {
-      setScanCount(totalUsers);
-    }
-  }, [totalUsers]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setScanCount(prev => prev + Math.floor(Math.random() * 2));
-    }, 5000 + Math.random() * 3000);
-    return () => clearInterval(interval);
-  }, []);
+  // Use real-time scan count from Supabase
+  const { count: scanCount } = useRealtimeScanCount(totalUsers);
 
   const handlePasteScan = () => {
     setPasteError('');
