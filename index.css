@@ -171,9 +171,83 @@ appkit-modal::part(container) {
 
 @layer base {
   body {
-    background-color: #020205;
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    background-attachment: fixed;
     color: #ffffff;
     -webkit-tap-highlight-color: transparent;
+    min-height: 100vh;
+  }
+  
+  /* Animated gradient background */
+  .glass-bg {
+    background: linear-gradient(135deg, 
+      rgba(15, 12, 41, 0.95) 0%, 
+      rgba(48, 43, 99, 0.9) 50%, 
+      rgba(36, 36, 62, 0.95) 100%
+    );
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
+  }
+  
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  /* Glass card styles */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-card-strong {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+  
+  .glass-nav {
+    background: rgba(10, 10, 20, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-button {
+    background: linear-gradient(135deg, rgba(0, 82, 255, 0.8) 0%, rgba(99, 102, 241, 0.8) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 4px 20px rgba(0, 82, 255, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  
+  .glass-button:hover {
+    box-shadow: 
+      0 6px 30px rgba(0, 82, 255, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  
+  .glass-input {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-input:focus {
+    border-color: rgba(0, 82, 255, 0.5);
+    box-shadow: 0 0 20px rgba(0, 82, 255, 0.2);
   }
   
   /* Prevent modal clipping from overflow hidden parents */

@@ -18,7 +18,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange, ha
   ];
 
   return (
-    <nav className="relative z-20 bg-[#0a0a0f] border-t border-white/5 px-2 py-2 safe-area-bottom">
+    <nav className="relative z-20 glass-nav px-2 py-2 safe-area-bottom">
       <div className="flex items-center justify-around">
         {tabs.map(({ id, icon: Icon, label, disabled }) => (
           <button
@@ -26,16 +26,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange, ha
             onClick={() => !disabled && onTabChange(id)}
             disabled={disabled}
             className={`
-              flex flex-col items-center justify-center py-1.5 px-4 rounded-xl transition-all
+              flex flex-col items-center justify-center py-1.5 px-4 rounded-2xl transition-all duration-300
               ${activeTab === id 
-                ? 'text-base-blue bg-base-blue/10' 
+                ? 'text-base-blue bg-base-blue/20 shadow-[0_0_15px_rgba(0,82,255,0.3)]' 
                 : disabled 
-                  ? 'text-gray-700 cursor-not-allowed' 
-                  : 'text-gray-500 hover:text-white'
+                  ? 'text-gray-600 cursor-not-allowed' 
+                  : 'text-gray-400 hover:text-white hover:bg-white/10'
               }
             `}
           >
-            <Icon className="w-5 h-5 mb-0.5" />
+            <Icon className={`w-5 h-5 mb-0.5 ${activeTab === id ? 'drop-shadow-[0_0_6px_rgba(0,82,255,0.5)]' : ''}`} />
             <span className="text-[10px] font-medium">{label}</span>
           </button>
         ))}

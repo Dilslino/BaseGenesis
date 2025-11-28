@@ -63,10 +63,10 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
       )}
       
       {/* Card Container */}
-      <div className={`relative h-full w-full backdrop-blur-2xl border rounded-xl overflow-hidden shadow-2xl flex flex-col justify-between p-4 sm:p-5 ${
-        isOG ? 'bg-gradient-to-br from-[#0a0805]/95 via-[#050508]/95 to-[#080502]/95 border-yellow-500/40 card-og' : 
-        isPioneer ? 'bg-gradient-to-br from-[#080505]/95 via-[#050508]/95 to-[#050502]/95 border-amber-500/30 card-pioneer' :
-        'bg-[#050508]/90 border-white/10'
+      <div className={`relative h-full w-full backdrop-blur-2xl border rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between p-4 sm:p-5 ${
+        isOG ? 'bg-gradient-to-br from-[#0a0805]/90 via-[#050508]/85 to-[#080502]/90 border-yellow-500/40 card-og' : 
+        isPioneer ? 'bg-gradient-to-br from-[#080505]/90 via-[#050508]/85 to-[#050502]/90 border-amber-500/30 card-pioneer' :
+        'glass-card-strong'
       }`}>
         
         {/* Background Noise/Texture */}

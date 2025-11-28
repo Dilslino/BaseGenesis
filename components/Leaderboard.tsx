@@ -142,9 +142,10 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
             <div 
               key={`${entry.address}-${idx}`}
               className={`
-                relative p-3 rounded-xl border transition-all duration-300
-                ${badge.bg} ${badge.border} ${badge.glow}
-                ${isCurrentUser ? 'ring-2 ring-base-blue' : ''}
+                relative p-3 rounded-2xl transition-all duration-300
+                glass-card hover:bg-white/12
+                ${badge.glow}
+                ${isCurrentUser ? 'ring-2 ring-base-blue shadow-[0_0_20px_rgba(0,82,255,0.3)]' : ''}
               `}
             >
               <div className="flex items-center gap-3">
@@ -207,10 +208,10 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
 
       {/* User's Rank (if not in top 10) */}
       {userRank && userRank > 10 && (
-        <div className="mt-3 p-3 bg-base-blue/10 border border-base-blue/20 rounded-xl">
+        <div className="mt-3 p-3 glass-card rounded-2xl border-base-blue/30 shadow-[0_0_15px_rgba(0,82,255,0.2)]">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-400">Your Global Rank</span>
-            <span className="font-bold text-base-blue text-lg">#{userRank.toLocaleString()}</span>
+            <span className="text-sm text-gray-300">Your Global Rank</span>
+            <span className="font-bold text-base-blue text-lg drop-shadow-[0_0_8px_rgba(0,82,255,0.5)]">#{userRank.toLocaleString()}</span>
           </div>
         </div>
       )}

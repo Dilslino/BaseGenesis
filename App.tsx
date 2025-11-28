@@ -252,14 +252,14 @@ const App: React.FC = () => {
   // Loading screen
   if (!isLoaded) {
     return (
-      <div className="w-full min-h-screen max-w-[424px] mx-auto bg-base-black text-white flex items-center justify-center">
+      <div className="w-full min-h-screen max-w-[424px] mx-auto glass-bg text-white flex items-center justify-center">
         <LoadingSequence />
       </div>
     );
   }
 
   return (
-    <div className="w-full h-screen max-w-full sm:max-w-[480px] md:max-w-[520px] lg:max-w-[560px] mx-auto bg-base-black text-white font-sans flex flex-col relative">
+    <div className="w-full h-screen max-w-full sm:max-w-[480px] md:max-w-[520px] lg:max-w-[560px] mx-auto glass-bg text-white font-sans flex flex-col relative">
       
       {/* Confetti Effect */}
       {showConfetti && (
