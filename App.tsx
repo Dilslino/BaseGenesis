@@ -225,10 +225,11 @@ const App: React.FC = () => {
   }, []);
 
   // Share profile to Farcaster with embeds
-  const handleShare = async (text: string, url: string) => {
+  const handleShare = async (text: string, _url: string) => {
     if (!userData) return;
-    // Include the URL in the share text with proper embed format
-    const fullText = `${text}\n\n${url}`;
+    // Use dynamic share URL that generates card image
+    const shareUrl = `https://basegenesis.vercel.app/share/${userData.address}`;
+    const fullText = `${text}\n\n${shareUrl}`;
     await shareToWarpcast(fullText);
   };
 
