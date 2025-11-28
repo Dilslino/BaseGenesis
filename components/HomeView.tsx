@@ -18,26 +18,48 @@ interface HomeViewProps {
 }
 
 const AnimatedCounter: React.FC<{ value: number }> = ({ value }) => {
-  const [displayValue, setDisplayValue] = useState(0);
+  const [displayValue, setDisplayValue] = useState<number | null>(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
   
   useEffect(() => {
-    const duration = 2000;
-    const steps = 60;
-    const increment = value / steps;
-    let current = 0;
+    if (value <= 0) return;
     
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= value) {
-        setDisplayValue(value);
-        clearInterval(timer);
-      } else {
-        setDisplayValue(Math.floor(current));
-      }
-    }, duration / steps);
+    // First time: just set the value directly (no animation from 0)
+    if (!hasInitialized) {
+      setDisplayValue(value);
+      setHasInitialized(true);
+      return;
+    }
     
-    return () => clearInterval(timer);
-  }, [value]);
+    // Subsequent updates: animate only the increment (+1, +2, etc)
+    const prevValue = displayValue || value;
+    if (value > prevValue) {
+      // Small animation for increment
+      const diff = value - prevValue;
+      const steps = Math.min(diff * 10, 30);
+      const increment = diff / steps;
+      let current = prevValue;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= value) {
+          setDisplayValue(value);
+          clearInterval(timer);
+        } else {
+          setDisplayValue(Math.floor(current));
+        }
+      }, 50);
+      
+      return () => clearInterval(timer);
+    } else {
+      setDisplayValue(value);
+    }
+  }, [value, hasInitialized]);
+  
+  // Show nothing until we have a value
+  if (displayValue === null) {
+    return <span>...</span>;
+  }
   
   return <span>{displayValue.toLocaleString()}</span>;
 };
