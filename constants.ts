@@ -3,9 +3,10 @@ import { UserRank, LeaderboardEntry, Achievement } from './types';
 export const BASE_LAUNCH_DATE = new Date('2023-08-09T00:00:00Z');
 
 export const RANK_THRESHOLDS = {
-  OG_DAYS: 7,        // First week = OG Legend
-  PIONEER_DAYS: 30,  // First month = Genesis Pioneer  
-  SETTLER_DAYS: 180, // First 6 months = Early Settler
+  OG_DAYS: 30,        // First month after launch = OG Legend
+  PIONEER_DAYS: 180,  // First 6 months = Genesis Pioneer  
+  SETTLER_DAYS: 365,  // First year = Early Settler
+  // After 1 year = Base Citizen
 };
 
 export const MINT_PRICE_ETH = "0.0003";
@@ -27,9 +28,9 @@ export const RANK_BADGE_COLORS: Record<UserRank, string> = {
 };
 
 export const RANK_DESCRIPTIONS: Record<UserRank, string> = {
-  [UserRank.OG_LEGEND]: "The rarest of them all. You were here before anyone else.",
-  [UserRank.GENESIS_PIONEER]: "You were here at the dawn. A true believer.",
-  [UserRank.EARLY_SETTLER]: "You helped build the foundation.",
+  [UserRank.OG_LEGEND]: "The rarest of them all. You joined in the first month of Base.",
+  [UserRank.GENESIS_PIONEER]: "A true believer. You joined in the first 6 months.",
+  [UserRank.EARLY_SETTLER]: "You helped build the foundation in the first year.",
   [UserRank.BASE_CITIZEN]: "A vital part of the growing ecosystem.",
   [UserRank.UNKNOWN]: "Data unavailable."
 };
