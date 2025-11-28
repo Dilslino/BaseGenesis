@@ -1,7 +1,7 @@
 import React from 'react';
 import { UserGenesisData, UserRank } from '../types';
 import { RANK_COLORS } from '../constants';
-import { Hash, Calendar, Layers, Crown, Trophy, Sparkles } from 'lucide-react';
+import { Hash, Calendar, Layers, Crown, Trophy, Sparkles, Zap, Globe } from 'lucide-react';
 
 interface FlexCardProps {
   data: UserGenesisData;
@@ -19,6 +19,8 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
   const gradientColor = RANK_COLORS[data.rank] || "from-gray-700 to-gray-800";
   const isOG = data.rank === UserRank.OG_LEGEND;
   const isPioneer = data.rank === UserRank.GENESIS_PIONEER;
+  const isSettler = data.rank === UserRank.EARLY_SETTLER;
+  const isCitizen = data.rank === UserRank.BASE_CITIZEN;
 
   return (
     <div className={`relative w-full aspect-[1.58/1] max-w-[320px] mx-auto perspective-1000 group select-none ${isOG || isPioneer ? 'float-animation' : ''}`}>
@@ -61,12 +63,28 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
           </div>
         </>
       )}
+
+      {/* Settler Special Effects */}
+      {isSettler && (
+        <>
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-500 rounded-2xl blur-md opacity-25 group-hover:opacity-40 transition-opacity duration-500"></div>
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full opacity-60"></div>
+        </>
+      )}
+
+      {/* Citizen Special Effects */}
+      {isCitizen && (
+        <>
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-slate-500 via-gray-400 to-slate-500 rounded-2xl blur-md opacity-20 group-hover:opacity-35 transition-opacity duration-500"></div>
+        </>
+      )}
       
       {/* Card Container */}
-      <div className={`relative h-full w-full backdrop-blur-2xl border rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between p-4 sm:p-5 ${
+      <div className={`relative h-full w-full backdrop-blur-2xl border rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between p-4 sm:p-5 transition-all duration-500 ${
         isOG ? 'bg-gradient-to-br from-[#0a0805]/90 via-[#050508]/85 to-[#080502]/90 border-yellow-500/40 card-og' : 
         isPioneer ? 'bg-gradient-to-br from-[#080505]/90 via-[#050508]/85 to-[#050502]/90 border-amber-500/30 card-pioneer' :
-        'glass-card-strong'
+        isSettler ? 'bg-gradient-to-br from-[#051015]/90 via-[#050510]/85 to-[#051010]/90 border-cyan-500/30 card-settler' :
+        'bg-gradient-to-br from-[#0a0a10]/90 via-[#080812]/85 to-[#0a0a0f]/90 border-slate-500/25 card-citizen'
       }`}>
         
         {/* Background Noise/Texture */}
@@ -84,6 +102,20 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
         {isPioneer && (
           <div className="absolute top-2 right-2 float-animation">
             <Trophy className="w-6 h-6 text-amber-400 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]" />
+          </div>
+        )}
+
+        {/* Settler Zap decoration */}
+        {isSettler && (
+          <div className="absolute top-2 right-2 animate-pulse">
+            <Zap className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_4px_rgba(6,182,212,0.6)]" />
+          </div>
+        )}
+
+        {/* Citizen Globe decoration */}
+        {isCitizen && (
+          <div className="absolute top-2 right-2 opacity-70 group-hover:opacity-100 transition-opacity">
+            <Globe className="w-5 h-5 text-slate-400 drop-shadow-[0_0_3px_rgba(148,163,184,0.5)]" />
           </div>
         )}
 
@@ -108,16 +140,20 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
             <h2 className={`text-2xl min-[340px]:text-3xl font-black italic tracking-tighter drop-shadow-lg truncate ${
               isOG ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-500 og-title' : 
               isPioneer ? 'text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-yellow-500' :
-              'text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400'
+              isSettler ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-400 to-cyan-500' :
+              'text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-gray-300 to-slate-400'
             }`}>
               {isOG && <span className="mr-1">👑</span>}
               {isPioneer && <span className="mr-1">🏆</span>}
+              {isSettler && <span className="mr-1">⚡</span>}
+              {isCitizen && <span className="mr-1">🌐</span>}
               {data.rank.split(' ')[0]} <span className="text-lg sm:text-2xl">{data.rank.split(' ')[1]}</span>
             </h2>
             <div className={`h-0.5 bg-gradient-to-r mt-1 ${
               isOG ? 'from-yellow-400 via-orange-500 to-transparent w-20' : 
               isPioneer ? 'from-amber-400 via-orange-400 to-transparent w-16' :
-              'from-base-blue to-transparent w-12'
+              isSettler ? 'from-cyan-400 via-teal-400 to-transparent w-14' :
+              'from-slate-400 via-gray-500 to-transparent w-12'
             }`}></div>
         </div>
 
