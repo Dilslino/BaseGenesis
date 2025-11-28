@@ -103,7 +103,6 @@ export const DonateModal: React.FC<DonateModalProps> = ({
                 <Heart className="w-6 h-6 text-pink-400" />
               </div>
               <h3 className="text-lg font-bold text-white">Support the Creator</h3>
-              <p className="text-gray-400 text-sm mt-1">Help keep BaseGenesis running</p>
             </div>
 
             {/* Token Selection */}
