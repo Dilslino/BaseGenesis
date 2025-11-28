@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Trophy, Crown, Star, Medal, Award, Gem, Flame, Zap, Shield } from 'lucide-react';
 import { LeaderboardEntry, UserRank } from '../types';
-import { RANK_BADGE_COLORS, RANK_EMOJI } from '../constants';
+import { RANK_BADGE_COLORS, RANK_EMOJI, RANK_COLORS } from '../constants';
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
@@ -179,12 +179,25 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
                   </div>
                 </div>
 
-                {/* Stats */}
+                {/* Rank Card Badge */}
                 <div className="flex flex-col items-end gap-1">
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded border ${RANK_BADGE_COLORS[entry.status]}`}>
-                    {RANK_EMOJI[entry.status]} {entry.status.split(' ')[0]}
-                  </span>
-                  <span className="text-xs font-bold text-white">{entry.days}d</span>
+                  {/* Mini Genesis Card */}
+                  <div className={`
+                    relative w-10 h-14 rounded-md overflow-hidden
+                    bg-gradient-to-br ${RANK_COLORS[entry.status]}
+                    border border-white/20 shadow-lg
+                  `}>
+                    {/* Card inner content */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30">
+                      <span className="text-lg">{RANK_EMOJI[entry.status]}</span>
+                      <span className="text-[6px] font-bold text-white/90 mt-0.5 text-center leading-tight px-0.5">
+                        {entry.status.split(' ')[0]}
+                      </span>
+                    </div>
+                    {/* Shine effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent" />
+                  </div>
+                  <span className="text-[10px] text-gray-400 font-mono">{entry.days}d</span>
                 </div>
               </div>
             </div>
