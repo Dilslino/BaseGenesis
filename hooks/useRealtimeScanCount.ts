@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getTotalScans, subscribeToScanCount } from '../services/supabase';
+import { subscribeToScanCountFirebase } from '../services/firebaseCounter';
 
 interface UseRealtimeScanCountResult {
   count: number;
@@ -8,23 +8,15 @@ interface UseRealtimeScanCountResult {
 
 export const useRealtimeScanCount = (initialCount?: number): UseRealtimeScanCountResult => {
   const [count, setCount] = useState<number>(initialCount || 0);
-  const [isLoading, setIsLoading] = useState<boolean>(!initialCount);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Fetch initial count
-    const fetchInitialCount = async () => {
-      const total = await getTotalScans();
-      setCount(total);
+    // Subscribe to real-time updates from Firebase
+    // Firebase onValue automatically provides initial value
+    const unsubscribe = subscribeToScanCountFirebase((newCount) => {
+      // Use Firebase count if > 0, otherwise fallback to initialCount
+      setCount(newCount > 0 ? newCount : (initialCount || 0));
       setIsLoading(false);
-    };
-
-    if (!initialCount) {
-      fetchInitialCount();
-    }
-
-    // Subscribe to real-time updates
-    const unsubscribe = subscribeToScanCount((newCount) => {
-      setCount(newCount);
     });
 
     // Cleanup subscription on unmount

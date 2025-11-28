@@ -12,7 +12,8 @@ import { LoadingSequence } from './components/LoadingSequence';
 import { DonateModal } from './components/DonateModal';
 import { ConnectWalletModal } from './components/ConnectWalletModal';
 import { getBaseGenesisData } from './services/baseService';
-import { saveUserProfile, getLeaderboard, getTotalUsers, getUserRankPosition, saveScan } from './services/supabase';
+import { saveUserProfile, getLeaderboard, getTotalUsers, getUserRankPosition } from './services/supabase';
+import { saveScanFirebase } from './services/firebaseCounter';
 import { useFarcaster } from './hooks/useFarcaster';
 import { useDonate } from './hooks/useDonate';
 import { UserGenesisData, LeaderboardEntry } from './types';
@@ -163,8 +164,8 @@ const App: React.FC = () => {
       const data = await getBaseGenesisData(walletAddress);
       setUserData(data);
       
-      // Save scan to trigger real-time counter update
-      await saveScan(walletAddress);
+      // Save scan to trigger real-time counter update (Firebase)
+      await saveScanFirebase(walletAddress);
       
       // Save to Supabase (only for connected wallets)
       if (isConnected) {
@@ -208,8 +209,8 @@ const App: React.FC = () => {
       const data = await getBaseGenesisData(address);
       setUserData(data);
       
-      // Save scan to trigger real-time counter update (even for paste scans)
-      await saveScan(address);
+      // Save scan to trigger real-time counter update (Firebase)
+      await saveScanFirebase(address);
       
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
