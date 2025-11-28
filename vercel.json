@@ -39,6 +39,10 @@
   ],
   "rewrites": [
     {
+      "source": "/image.png",
+      "destination": "/api/image"
+    },
+    {
       "source": "/((?!api|.well-known|assets|.*\\..*).*)",
       "destination": "/index.html"
     }
