@@ -113,12 +113,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-tight">
             Discover Your{' '}
             <span className="hero-title text-transparent bg-clip-text bg-gradient-to-r from-base-blue via-purple-400 to-cyan-300 animate-gradient-x">
-              Base Origin
+              Base Genesis
             </span>
           </h1>
           
           <p className="text-gray-400 text-sm sm:text-base max-w-[300px] sm:max-w-[360px] mx-auto">
-            Find out when you first joined Base and earn your Genesis rank
+            Discover the moment your Base journey began
           </p>
         </div>
 
