@@ -5,6 +5,7 @@ import { FarcasterUser } from '../types';
 interface UseFarcasterResult {
   isLoaded: boolean;
   isInFrame: boolean;
+  isAppAdded: boolean;
   user: FarcasterUser | null;
   walletAddress: string | null;
   error: string | null;
@@ -12,11 +13,13 @@ interface UseFarcasterResult {
   connectWallet: () => Promise<string | null>;
   openUrl: (url: string) => Promise<void>;
   shareToWarpcast: (text: string) => Promise<void>;
+  addMiniApp: () => Promise<boolean>;
 }
 
 export const useFarcaster = (): UseFarcasterResult => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInFrame, setIsInFrame] = useState(false);
+  const [isAppAdded, setIsAppAdded] = useState(false);
   const [user, setUser] = useState<FarcasterUser | null>(null);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +45,11 @@ export const useFarcaster = (): UseFarcasterResult => {
           } else if (context.user.custodyAddress) {
             setWalletAddress(context.user.custodyAddress);
           }
+        }
+        
+        // Check if app is already added
+        if (context?.client?.added) {
+          setIsAppAdded(true);
         }
         
         // Signal ready to Farcaster
@@ -105,15 +113,40 @@ export const useFarcaster = (): UseFarcasterResult => {
     await openUrl(shareUrl);
   }, [openUrl]);
 
+  const addMiniApp = useCallback(async (): Promise<boolean> => {
+    try {
+      if (!isInFrame) {
+        console.log('Not in Farcaster frame, cannot add mini app');
+        return false;
+      }
+      
+      await sdk.actions.addMiniApp();
+      setIsAppAdded(true);
+      return true;
+    } catch (err: any) {
+      console.error('Add mini app error:', err);
+      if (err.message?.includes('RejectedByUser')) {
+        setError('User rejected adding the app');
+      } else if (err.message?.includes('InvalidDomainManifestJson')) {
+        setError('Invalid manifest or domain mismatch');
+      } else {
+        setError(err.message || 'Failed to add mini app');
+      }
+      return false;
+    }
+  }, [isInFrame]);
+
   return {
     isLoaded,
     isInFrame,
+    isAppAdded,
     user,
     walletAddress,
     error,
     connectWallet,
     openUrl,
     shareToWarpcast,
+    addMiniApp,
   };
 };
 

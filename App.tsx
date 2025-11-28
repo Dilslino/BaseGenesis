@@ -51,12 +51,14 @@ const App: React.FC = () => {
   // Farcaster MiniKit hook
   const { 
     isLoaded, 
-    isInFrame, 
+    isInFrame,
+    isAppAdded,
     user, 
     walletAddress: farcasterWallet,
     connectWallet: connectFarcasterWallet,
     shareToWarpcast, 
     openUrl,
+    addMiniApp,
   } = useFarcaster();
   
   // Reown AppKit hooks
@@ -293,21 +295,36 @@ const App: React.FC = () => {
           <span className="font-bold tracking-tight">BaseGenesis</span>
         </div>
         
-        {/* User info */}
-        {isConnected && (
-          <div className="flex items-center gap-2">
-            {user?.pfpUrl ? (
-              <img src={user.pfpUrl} alt="" className="w-7 h-7 rounded-full border-2 border-green-500/50" />
-            ) : (
-              <div className="w-7 h-7 rounded-full bg-green-500/20 flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-              </div>
-            )}
-            {user?.username && (
-              <span className="text-xs text-gray-400">@{user.username}</span>
-            )}
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Add to Warpcast button */}
+          {isInFrame && !isAppAdded && (
+            <button
+              onClick={addMiniApp}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium
+                bg-purple-500/20 text-purple-400 border border-purple-500/30
+                hover:bg-purple-500/30 hover:border-purple-500/50
+                transition-all duration-200"
+            >
+              + Add App
+            </button>
+          )}
+          
+          {/* User info */}
+          {isConnected && (
+            <>
+              {user?.pfpUrl ? (
+                <img src={user.pfpUrl} alt="" className="w-7 h-7 rounded-full border-2 border-green-500/50" />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-green-500/20 flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                </div>
+              )}
+              {user?.username && (
+                <span className="text-xs text-gray-400">@{user.username}</span>
+              )}
+            </>
+          )}
+        </div>
       </header>
 
       {/* Main Content */}
