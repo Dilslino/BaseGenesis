@@ -1,20 +1,21 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function SharePage({ params }: { params: { address: string } }) {
+export default function SharePage({ params }: { params: Promise<{ address: string }> }) {
   const router = useRouter()
+  const { address } = use(params)
 
   useEffect(() => {
-    // Redirect to main app after a short delay
+    // Redirect to main app with address parameter
     // The meta tags will be served first for social previews
     const timer = setTimeout(() => {
-      router.push('/')
+      router.push(`/?address=${address}`)
     }, 100)
     
     return () => clearTimeout(timer)
-  }, [router])
+  }, [router, address])
 
   return (
     <div style={{

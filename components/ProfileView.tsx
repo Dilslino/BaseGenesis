@@ -19,9 +19,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ userData, onShareFarca
   const unlockedBadges = userData.achievements?.filter(a => a.unlocked).length || 0;
   const totalBadges = userData.achievements?.length || 0;
 
-  // Share URL with card preview
+  // Share URL with card preview - use /share/[address] route for Farcaster embed
   const appUrl = 'https://basegenesis.vercel.app';
-  const shareUrl = `${appUrl}?address=${userData.address}`;
+  const shareUrl = `${appUrl}/share/${userData.address}`;
   
   // Share messages
   const shareText = `${RANK_EMOJI[userData.rank]} I'm a ${userData.rank} on Base!\n\n${userData.daysSinceJoined} days since my first transaction.\n\nCheck your genesis rank:`;

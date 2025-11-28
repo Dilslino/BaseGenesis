@@ -80,9 +80,9 @@ async function getWalletData(address: string) {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { address: string } }
+  { params }: { params: Promise<{ address: string }> }
 ) {
-  const address = params.address
+  const { address } = await params
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
   
   const walletData = await getWalletData(address)

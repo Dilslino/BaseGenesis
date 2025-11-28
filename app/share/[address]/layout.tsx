@@ -1,11 +1,11 @@
 import { Metadata } from 'next'
 
 type Props = {
-  params: { address: string }
+  params: Promise<{ address: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const address = params.address
+  const { address } = await params
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
   const cardImageUrl = `https://basegenesis.vercel.app/api/card/${address}`
   const shareUrl = `https://basegenesis.vercel.app/share/${address}`
