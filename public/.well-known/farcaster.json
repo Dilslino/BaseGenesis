@@ -1,0 +1,33 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjIzODIzNiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweEEyQTc2RDhCNkE1MWQxNEM5MTQ1RjdFZkY4OTI0Qzg5MTZlMjFDODQifQ",
+    "payload": "eyJkb21haW4iOiJiYXNlZ2VuZXNpcy52ZXJjZWwuYXBwIn0",
+    "signature": "jsWnxdPBEIiNefxV3mklixw03yMnwEhT+NSSjOGD+q4Et48Xsq21lvTDJoTmVYDmTfXXlx4pkcMbtZ+i3R70vRw="
+  },
+  "frame": {
+    "version": "1",
+    "name": "BaseGenesis",
+    "iconUrl": "https://basegenesis.vercel.app/icon.png",
+    "homeUrl": "https://basegenesis.vercel.app",
+    "imageUrl": "https://basegenesis.vercel.app/image.png",
+    "buttonTitle": "Reveal My History",
+    "splashImageUrl": "https://basegenesis.vercel.app/splash.png",
+    "splashBackgroundColor": "#0052FF",
+    "webhookUrl": "https://basegenesis.vercel.app/api/webhook",
+    "subtitle": "How early were you on Base?",
+    "description": "Uncover your history on the Base blockchain. Find your first transaction, check your rank, and share your genesis moment with the community.",
+    "primaryCategory": "social",
+    "tags": ["base", "explorer", "analytics", "history", "onchain"],
+    "tagline": "Find your first Base tx",
+    "ogTitle": "BaseGenesis",
+    "ogDescription": "How early were you on Base?",
+    "ogImageUrl": "https://basegenesis.vercel.app/og-image.jpg",
+    "heroImageUrl": "https://basegenesis.vercel.app/og-image.jpg",
+    "screenshotUrls": [
+      "https://basegenesis.vercel.app/api/screenshot?type=home",
+      "https://basegenesis.vercel.app/api/screenshot?type=card",
+      "https://basegenesis.vercel.app/api/screenshot?type=leaderboard"
+    ],
+    "noindex": false
+  }
+}
