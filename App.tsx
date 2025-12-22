@@ -214,6 +214,17 @@ const App: React.FC = () => {
       // Save scan to trigger real-time counter update (Firebase)
       await saveScanFirebase(address);
       
+      // Save anonymous profile to Supabase for leaderboard (without Farcaster data)
+      await saveUserProfile(data, undefined);
+      
+      // Refresh leaderboard
+      const [leaderboard, total] = await Promise.all([
+        getLeaderboard(50),
+        getTotalUsers()
+      ]);
+      setLeaderboardData(leaderboard);
+      setTotalUsers(total);
+      
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
       setActiveTab('profile');

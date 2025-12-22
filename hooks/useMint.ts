@@ -1,8 +1,15 @@
-import { useState, useCallback } from 'react';
-import { parseEther, encodeFunctionData } from 'viem';
-import sdk from '@farcaster/frame-sdk';
+/**
+ * MINT FUNCTIONALITY - DISABLED
+ *
+ * This hook is currently disabled as minting is not being used.
+ * The code is preserved for future implementation.
+ *
+ * To re-enable:
+ * 1. Uncomment the implementation below
+ * 2. Ensure wagmi config exports are available
+ */
+
 import { UserGenesisData } from '../types';
-import { TREASURY_ADDRESS, NFT_CONTRACT_ADDRESS, NFT_ABI, MINT_PRICE } from '../config/wagmi';
 
 interface UseMintResult {
   mint: (userData: UserGenesisData, isInFrame?: boolean) => Promise<string | null>;
@@ -11,7 +18,27 @@ interface UseMintResult {
   txHash: string | null;
 }
 
+// Disabled mint hook - returns no-op functions
 export const useMint = (): UseMintResult => {
+  return {
+    mint: async () => {
+      console.warn('Mint functionality is currently disabled');
+      return null;
+    },
+    isLoading: false,
+    error: 'Mint functionality is currently disabled',
+    txHash: null,
+  };
+};
+
+/*
+// Original implementation - preserved for future use
+import { useState, useCallback } from 'react';
+import { parseEther, encodeFunctionData } from 'viem';
+import sdk from '@farcaster/frame-sdk';
+import { TREASURY_ADDRESS, NFT_CONTRACT_ADDRESS, NFT_ABI, MINT_PRICE } from '../config/wagmi';
+
+export const useMintOriginal = (): UseMintResult => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -22,25 +49,22 @@ export const useMint = (): UseMintResult => {
     setTxHash(null);
 
     try {
-      // Get the appropriate provider
       const provider = isInFrame ? sdk.wallet.ethProvider : window.ethereum;
-      
+
       if (!provider) {
         throw new Error('No wallet provider available');
       }
 
-      // Request account access
-      const accounts = await provider.request({ 
-        method: 'eth_requestAccounts' 
+      const accounts = await provider.request({
+        method: 'eth_requestAccounts'
       }) as string[];
-      
+
       if (!accounts || accounts.length === 0) {
         throw new Error('No accounts found. Please connect your wallet.');
       }
 
       const account = accounts[0];
 
-      // Ensure on Base network (chainId 8453)
       const chainId = await provider.request({ method: 'eth_chainId' }) as string;
       if (chainId !== '0x2105') {
         try {
@@ -66,14 +90,12 @@ export const useMint = (): UseMintResult => {
         }
       }
 
-      // Check if contract is deployed
       const isContractDeployed = NFT_CONTRACT_ADDRESS !== '0x0000000000000000000000000000000000000000';
-      
+
       let hash: string;
       const mintValue = '0x' + parseEther(MINT_PRICE).toString(16);
 
       if (isContractDeployed) {
-        // Encode mint function call
         const data = encodeFunctionData({
           abi: NFT_ABI,
           functionName: 'mint',
@@ -95,7 +117,6 @@ export const useMint = (): UseMintResult => {
           }],
         }) as string;
       } else {
-        // Send directly to treasury
         hash = await provider.request({
           method: 'eth_sendTransaction',
           params: [{
@@ -112,7 +133,7 @@ export const useMint = (): UseMintResult => {
 
     } catch (err: any) {
       console.error('Mint error:', err);
-      
+
       if (err.code === 4001) {
         setError('Transaction rejected');
       } else if (err.code === -32603) {
@@ -128,3 +149,4 @@ export const useMint = (): UseMintResult => {
 
   return { mint, isLoading, error, txHash };
 };
+*/

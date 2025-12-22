@@ -1,30 +1,10 @@
 import { ImageResponse } from 'next/og'
 import { NextRequest } from 'next/server'
+import { BASE_LAUNCH_DATE, RANK_THRESHOLDS, RANK_CONFIG } from '../../../../lib/rankUtils'
+import { checkRateLimit, getClientIp } from '../../../../lib/rateLimit'
+import { fetchWithRetry } from '../../../../lib/retryHelper'
 
 export const runtime = 'edge'
-
-const RANK_COLORS: Record<string, { gradient: string; glow: string; emoji: string }> = {
-  'OG LEGEND': { 
-    gradient: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ea580c 100%)',
-    glow: 'rgba(251, 191, 36, 0.5)',
-    emoji: '👑'
-  },
-  'GENESIS PIONEER': { 
-    gradient: 'linear-gradient(135deg, #fcd34d 0%, #f97316 50%, #fbbf24 100%)',
-    glow: 'rgba(245, 158, 11, 0.4)',
-    emoji: '🏆'
-  },
-  'EARLY SETTLER': { 
-    gradient: 'linear-gradient(135deg, #22d3ee 0%, #14b8a6 50%, #06b6d4 100%)',
-    glow: 'rgba(6, 182, 212, 0.4)',
-    emoji: '⚡'
-  },
-  'BASE CITIZEN': { 
-    gradient: 'linear-gradient(135deg, #94a3b8 0%, #64748b 50%, #94a3b8 100%)',
-    glow: 'rgba(148, 163, 184, 0.3)',
-    emoji: '🌐'
-  },
-}
 
 async function getWalletData(address: string) {
   try {
@@ -39,7 +19,12 @@ async function getWalletData(address: string) {
       sort: 'asc'
     })
 
-    const response = await fetch(`https://base.blockscout.com/api?${params.toString()}`)
+    const response = await fetchWithRetry(
+      `https://base.blockscout.com/api?${params.toString()}`,
+      undefined,
+      8000,
+      { maxAttempts: 2 }
+    )
     const data = await response.json()
 
     if (data.status === '0' || !data.result || data.result.length === 0) {
@@ -48,21 +33,20 @@ async function getWalletData(address: string) {
 
     const firstTx = data.result[0]
     const txDate = new Date(parseInt(firstTx.timeStamp) * 1000)
-    const baseLaunchDate = new Date('2023-08-09T00:00:00Z')
-    
+
     const diffTime = Math.abs(new Date().getTime() - txDate.getTime())
     const daysSinceJoined = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    
-    const diffFromLaunch = Math.abs(txDate.getTime() - baseLaunchDate.getTime())
+
+    const diffFromLaunch = Math.abs(txDate.getTime() - BASE_LAUNCH_DATE.getTime())
     const daysSinceLaunch = Math.ceil(diffFromLaunch / (1000 * 60 * 60 * 24))
-    const isPreLaunch = txDate < baseLaunchDate
+    const isPreLaunch = txDate < BASE_LAUNCH_DATE
 
     let rank = 'BASE CITIZEN'
-    if (isPreLaunch || daysSinceLaunch <= 30) {
+    if (isPreLaunch || daysSinceLaunch <= RANK_THRESHOLDS.OG_DAYS) {
       rank = 'OG LEGEND'
-    } else if (daysSinceLaunch <= 180) {
+    } else if (daysSinceLaunch <= RANK_THRESHOLDS.PIONEER_DAYS) {
       rank = 'GENESIS PIONEER'
-    } else if (daysSinceLaunch <= 365) {
+    } else if (daysSinceLaunch <= RANK_THRESHOLDS.SETTLER_DAYS) {
       rank = 'EARLY SETTLER'
     }
 
@@ -82,13 +66,28 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ address: string }> }
 ) {
+  // Rate limiting: 20 requests per minute per IP
+  const clientIp = getClientIp(request);
+  const rateLimit = checkRateLimit(clientIp, { limit: 20, windowSeconds: 60 });
+  
+  if (!rateLimit.success) {
+    return new Response('Too many requests', { 
+      status: 429,
+      headers: {
+        'X-RateLimit-Limit': rateLimit.limit.toString(),
+        'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+        'X-RateLimit-Reset': new Date(rateLimit.reset).toISOString(),
+      }
+    });
+  }
+  
   const { address } = await params
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
   
   const walletData = await getWalletData(address)
   
   const rank = walletData?.rank || 'BASE CITIZEN'
-  const rankConfig = RANK_COLORS[rank] || RANK_COLORS['BASE CITIZEN']
+  const rankConfig = RANK_CONFIG[rank] || RANK_CONFIG['BASE CITIZEN']
   const daysSinceJoined = walletData?.daysSinceJoined || 0
   const firstTxDate = walletData?.firstTxDate || 'Unknown'
   const blockNumber = walletData?.blockNumber || '0'

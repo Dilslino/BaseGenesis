@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { parseEther, parseUnits, encodeFunctionData } from 'viem';
 import sdk from '@farcaster/frame-sdk';
+import { getEthPrice } from '../lib/ethPrice';
 
 const CREATOR_WALLET = '0xEA83Fad9414A2e82Ea00Fb30e4C3e09B7E51fE4d' as const;
 
@@ -15,6 +16,26 @@ const ERC20_TRANSFER_ABI = [
     stateMutability: 'nonpayable',
     inputs: [
       { name: 'to', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    outputs: [{ type: 'bool' }],
+  },
+  {
+    name: 'allowance',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+    ],
+    outputs: [{ type: 'uint256' }],
+  },
+  {
+    name: 'approve',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'spender', type: 'address' },
       { name: 'amount', type: 'uint256' },
     ],
     outputs: [{ type: 'bool' }],
@@ -46,13 +67,15 @@ export const useDonate = (): UseDonateResult => {
         throw new Error('No wallet provider available');
       }
 
-      const accounts = await provider.request({ 
+      const result = await provider.request({ 
         method: 'eth_requestAccounts' 
-      }) as string[];
+      });
       
-      if (!accounts || accounts.length === 0) {
-        throw new Error('No wallet connected');
+      if (!Array.isArray(result) || result.length === 0) {
+        throw new Error('No accounts returned. Please connect your wallet.');
       }
+      
+      const accounts = result as string[];
 
       const account = accounts[0];
 
@@ -88,6 +111,44 @@ export const useDonate = (): UseDonateResult => {
         // USDC has 6 decimals
         const amount = parseUnits(amountUsd, 6);
         
+        // Check current allowance
+        const allowanceData = encodeFunctionData({
+          abi: ERC20_TRANSFER_ABI,
+          functionName: 'allowance',
+          args: [account as `0x${string}`, CREATOR_WALLET],
+        });
+
+        const currentAllowance = await provider.request({
+          method: 'eth_call',
+          params: [{
+            to: USDC_ADDRESS,
+            data: allowanceData,
+          }, 'latest'],
+        }) as string;
+
+        const allowanceBigInt = BigInt(currentAllowance);
+
+        // Request approval if allowance is insufficient
+        if (allowanceBigInt < amount) {
+          const approveData = encodeFunctionData({
+            abi: ERC20_TRANSFER_ABI,
+            functionName: 'approve',
+            args: [CREATOR_WALLET, amount],
+          });
+
+          const approveTxHash = await provider.request({
+            method: 'eth_sendTransaction',
+            params: [{
+              from: account,
+              to: USDC_ADDRESS,
+              data: approveData,
+            }],
+          }) as string;
+
+          // Wait for approval confirmation (optional: could add polling)
+          console.log('Approval transaction:', approveTxHash);
+        }
+        
         const data = encodeFunctionData({
           abi: ERC20_TRANSFER_ABI,
           functionName: 'transfer',
@@ -103,8 +164,8 @@ export const useDonate = (): UseDonateResult => {
           }],
         }) as string;
       } else {
-        // ETH - convert USD to ETH (approximate: $3000/ETH)
-        const ethPrice = 3000;
+        // ETH - convert USD to ETH using real-time price
+        const ethPrice = await getEthPrice();
         const ethAmount = parseFloat(amountUsd) / ethPrice;
         const ethValue = parseEther(ethAmount.toFixed(18));
 

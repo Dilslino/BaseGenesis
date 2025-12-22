@@ -1,10 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
 import { UserGenesisData, UserRank, LeaderboardEntry } from '../types';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from '../lib/supabase';
 
 export interface UserProfile {
   id?: string;
@@ -27,6 +22,11 @@ export const saveUserProfile = async (
   userData: UserGenesisData,
   farcasterUser?: { username?: string; pfpUrl?: string; fid?: number }
 ): Promise<boolean> => {
+  if (!supabase) {
+    console.warn('Supabase not initialized, skipping profile save');
+    return false;
+  }
+  
   try {
     const profile: UserProfile = {
       address: userData.address.toLowerCase(),
@@ -62,6 +62,10 @@ export const saveUserProfile = async (
 
 // Get leaderboard from database
 export const getLeaderboard = async (limit: number = 50): Promise<LeaderboardEntry[]> => {
+  if (!supabase) {
+    return [];
+  }
+  
   try {
     const { data, error } = await supabase
       .from('users')
@@ -92,6 +96,10 @@ export const getLeaderboard = async (limit: number = 50): Promise<LeaderboardEnt
 
 // Get total user count
 export const getTotalUsers = async (): Promise<number> => {
+  if (!supabase) {
+    return 0;
+  }
+  
   try {
     const { count, error } = await supabase
       .from('users')
@@ -111,6 +119,10 @@ export const getTotalUsers = async (): Promise<number> => {
 
 // Get user rank position
 export const getUserRankPosition = async (address: string): Promise<number | null> => {
+  if (!supabase) {
+    return null;
+  }
+  
   try {
     const { data, error } = await supabase
       .from('users')
@@ -136,6 +148,10 @@ export const getUserRankPosition = async (address: string): Promise<number | nul
 
 // Save a scan record (called when user scans wallet)
 export const saveScan = async (walletAddress: string): Promise<boolean> => {
+  if (!supabase) {
+    return false;
+  }
+  
   try {
     const { error } = await supabase
       .from('scans')
@@ -155,6 +171,10 @@ export const saveScan = async (walletAddress: string): Promise<boolean> => {
 
 // Get total scans from global_stats
 export const getTotalScans = async (): Promise<number> => {
+  if (!supabase) {
+    return 0;
+  }
+  
   try {
     const { data, error } = await supabase
       .from('global_stats')
@@ -179,6 +199,10 @@ export const getTotalScans = async (): Promise<number> => {
 export const subscribeToScanCount = (
   onUpdate: (count: number) => void
 ): (() => void) => {
+  if (!supabase) {
+    return () => {}; // Return no-op unsubscribe
+  }
+  
   const channel = supabase
     .channel('global_stats_changes')
     .on(

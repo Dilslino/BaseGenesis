@@ -1,5 +1,7 @@
-import { BASE_LAUNCH_DATE, RANK_THRESHOLDS, ACHIEVEMENTS_LIST } from '../constants';
+import { ACHIEVEMENTS_LIST } from '../constants';
 import { UserGenesisData, UserRank, Transaction, Achievement } from '../types';
+import { calculateRank, calculateDaysSinceJoined, parseTimestamp } from '../lib/rankUtils';
+import { fetchWithRetry } from '../lib/retryHelper';
 
 const BLOCKSCOUT_API_URL = 'https://base.blockscout.com/api';
 
@@ -73,9 +75,20 @@ export const getBaseGenesisData = async (address: string): Promise<UserGenesisDa
       sort: 'asc'
     });
 
+    // Use retry logic with 10s timeout
     const [firstTxResponse, txCountResponse] = await Promise.all([
-      fetch(`${BLOCKSCOUT_API_URL}?${firstTxParams.toString()}`),
-      fetch(`${BLOCKSCOUT_API_URL}?${txCountParams.toString()}`)
+      fetchWithRetry(
+        `${BLOCKSCOUT_API_URL}?${firstTxParams.toString()}`,
+        { headers: { 'Accept': 'application/json' } },
+        10000,
+        { maxAttempts: 2 }
+      ),
+      fetchWithRetry(
+        `${BLOCKSCOUT_API_URL}?${txCountParams.toString()}`,
+        { headers: { 'Accept': 'application/json' } },
+        10000,
+        { maxAttempts: 2 }
+      )
     ]);
 
     const firstTxData = await firstTxResponse.json();
@@ -103,23 +116,9 @@ export const getBaseGenesisData = async (address: string): Promise<UserGenesisDa
 
     const txCount = Array.isArray(txCountData.result) ? txCountData.result.length : 0;
 
-    const txDate = new Date(parseInt(firstTx.timeStamp) * 1000);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - txDate.getTime());
-    const daysSinceJoined = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    const diffFromLaunch = Math.abs(txDate.getTime() - BASE_LAUNCH_DATE.getTime());
-    const daysSinceLaunch = Math.ceil(diffFromLaunch / (1000 * 60 * 60 * 24));
-    const isPreLaunch = txDate < BASE_LAUNCH_DATE;
-
-    let rank = UserRank.BASE_CITIZEN;
-    if (isPreLaunch || daysSinceLaunch <= RANK_THRESHOLDS.OG_DAYS) {
-      rank = UserRank.OG_LEGEND;
-    } else if (daysSinceLaunch <= RANK_THRESHOLDS.PIONEER_DAYS) {
-      rank = UserRank.GENESIS_PIONEER;
-    } else if (daysSinceLaunch <= RANK_THRESHOLDS.SETTLER_DAYS) {
-      rank = UserRank.EARLY_SETTLER;
-    }
+    const txDate = parseTimestamp(firstTx.timeStamp);
+    const daysSinceJoined = calculateDaysSinceJoined(txDate);
+    const rank = calculateRank(txDate);
 
     const achievements = calculateAchievements(daysSinceJoined, rank, txCount, firstTx.blockNumber);
 

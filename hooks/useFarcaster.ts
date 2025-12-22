@@ -70,18 +70,31 @@ export const useFarcaster = (): UseFarcasterResult => {
     try {
       if (isInFrame && sdk.wallet) {
         const provider = sdk.wallet.ethProvider;
-        const accounts = await provider.request({ 
+        const result = await provider.request({ 
           method: 'eth_requestAccounts' 
-        }) as string[];
+        });
+        
+        // Validate response
+        if (!Array.isArray(result) || result.length === 0) {
+          throw new Error('No accounts returned from wallet');
+        }
+        
+        const accounts = result as string[];
         
         if (accounts && accounts.length > 0) {
           setWalletAddress(accounts[0]);
           return accounts[0];
         }
       } else if (window.ethereum) {
-        const accounts = await window.ethereum.request({ 
+        const result = await window.ethereum.request({ 
           method: 'eth_requestAccounts' 
-        }) as string[];
+        });
+        
+        if (!Array.isArray(result) || result.length === 0) {
+          throw new Error('No accounts returned from wallet');
+        }
+        
+        const accounts = result as string[];
         
         if (accounts && accounts.length > 0) {
           setWalletAddress(accounts[0]);

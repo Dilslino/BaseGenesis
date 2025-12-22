@@ -5,6 +5,11 @@ const SCAN_COUNT_PATH = 'stats/totalScans';
 
 // Save a scan and increment counter atomically
 export const saveScanFirebase = async (walletAddress: string): Promise<boolean> => {
+  if (!database) {
+    console.warn('Firebase not initialized, skipping scan save');
+    return false;
+  }
+  
   try {
     const countRef = ref(database, SCAN_COUNT_PATH);
     
@@ -21,6 +26,10 @@ export const saveScanFirebase = async (walletAddress: string): Promise<boolean> 
 
 // Get total scans
 export const getTotalScansFirebase = async (): Promise<number> => {
+  if (!database) {
+    return 0;
+  }
+  
   try {
     const countRef = ref(database, SCAN_COUNT_PATH);
     const snapshot = await get(countRef);
@@ -35,6 +44,10 @@ export const getTotalScansFirebase = async (): Promise<number> => {
 export const subscribeToScanCountFirebase = (
   onUpdate: (count: number) => void
 ): (() => void) => {
+  if (!database) {
+    return () => {}; // Return no-op unsubscribe
+  }
+  
   const countRef = ref(database, SCAN_COUNT_PATH);
   
   const unsubscribe = onValue(countRef, (snapshot) => {

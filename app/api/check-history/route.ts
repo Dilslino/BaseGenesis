@@ -1,13 +1,34 @@
 
 import { NextResponse } from 'next/server';
-import { BASE_LAUNCH_DATE, RANK_THRESHOLDS, MOCK_LEADERBOARD } from '../../../constants';
+import { MOCK_LEADERBOARD } from '../../../constants';
 import { UserRank, LeaderboardEntry } from '../../../types';
 import { supabase } from '../../lib/supabase';
+import { calculateRank, calculateDaysSinceJoined, parseTimestamp } from '../../../lib/rankUtils';
+import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
+import { fetchWithRetry } from '../../../lib/retryHelper';
 
 // Blockscout API Configuration (Base Mainnet)
 const BLOCKSCOUT_API_URL = 'https://base.blockscout.com/api';
 
 export async function POST(request: Request) {
+  // Rate limiting: 10 requests per minute per IP
+  const clientIp = getClientIp(request);
+  const rateLimit = checkRateLimit(clientIp, { limit: 10, windowSeconds: 60 });
+  
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { 
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': rateLimit.limit.toString(),
+          'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+          'X-RateLimit-Reset': new Date(rateLimit.reset).toISOString(),
+        }
+      }
+    );
+  }
+  
   try {
     const { address } = await request.json();
 
@@ -27,11 +48,14 @@ export async function POST(request: Request) {
       sort: 'asc', 
     });
 
-    const fetchUrl = `${BLOCKSCOUT_API_URL}?${params.toString()}`;
-    const response = await fetch(fetchUrl, {
+    const response = await fetchWithRetry(
+      `${BLOCKSCOUT_API_URL}?${params.toString()}`,
+      {
         headers: { 'Accept': 'application/json' },
-        next: { revalidate: 60 } 
-    });
+      },
+      10000,
+      { maxAttempts: 2 }
+    );
     
     const data = await response.json();
 
@@ -47,21 +71,9 @@ export async function POST(request: Request) {
     }
 
     // 2. PROCESS USER DATA
-    const txDate = new Date(parseInt(firstTx.timeStamp) * 1000);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - txDate.getTime());
-    const daysSinceJoined = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    const diffFromLaunch = Math.abs(txDate.getTime() - BASE_LAUNCH_DATE.getTime());
-    const daysSinceLaunch = Math.ceil(diffFromLaunch / (1000 * 60 * 60 * 24));
-    const isPreLaunch = txDate < BASE_LAUNCH_DATE;
-
-    let rank = UserRank.BASE_CITIZEN;
-    if (isPreLaunch || daysSinceLaunch <= RANK_THRESHOLDS.PIONEER_DAYS) {
-      rank = UserRank.GENESIS_PIONEER;
-    } else if (daysSinceLaunch <= RANK_THRESHOLDS.SETTLER_DAYS) {
-      rank = UserRank.EARLY_SETTLER;
-    }
+    const txDate = parseTimestamp(firstTx.timeStamp);
+    const daysSinceJoined = calculateDaysSinceJoined(txDate);
+    const rank = calculateRank(txDate);
 
     const userData = {
       address,

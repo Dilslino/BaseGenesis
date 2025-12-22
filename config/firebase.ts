@@ -11,5 +11,23 @@ const firebaseConfig = {
   databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
 };
 
-const app = initializeApp(firebaseConfig);
-export const database = getDatabase(app);
+// Validate Firebase credentials
+const hasCredentials = Object.values(firebaseConfig).every(
+  (value) => value !== undefined && value !== ''
+);
+
+let database: ReturnType<typeof getDatabase> | null = null;
+
+if (hasCredentials) {
+  try {
+    const app = initializeApp(firebaseConfig);
+    database = getDatabase(app);
+  } catch (error) {
+    console.error('Firebase initialization error:', error);
+    console.warn('⚠️ Firebase is disabled. Counter functionality will not work.');
+  }
+} else {
+  console.warn('⚠️ Firebase credentials missing. Counter functionality will be disabled.');
+}
+
+export { database };
