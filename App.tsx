@@ -168,6 +168,7 @@ const App: React.FC = () => {
       
       // Save scan to trigger real-time counter update (Firebase)
       await saveScanFirebase(walletAddress);
+      console.log('✅ Scan saved to Firebase for real-time counter');
       
       // Save to Supabase (only for connected wallets)
       if (isConnected) {
@@ -213,6 +214,7 @@ const App: React.FC = () => {
       
       // Save scan to trigger real-time counter update (Firebase)
       await saveScanFirebase(address);
+      console.log('✅ Anonymous scan saved to Firebase for real-time counter');
       
       // Save anonymous profile to Supabase for leaderboard (without Farcaster data)
       await saveUserProfile(data, undefined);

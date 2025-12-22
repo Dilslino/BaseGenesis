@@ -85,7 +85,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [pasteError, setPasteError] = useState('');
   
   // Use real-time scan count from Supabase
-  const { count: scanCount } = useRealtimeScanCount(totalUsers);
+  const { count: scanCount, isLoading } = useRealtimeScanCount(totalUsers);
 
   const handlePasteScan = () => {
     setPasteError('');
@@ -268,7 +268,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <AnimatedCounter value={scanCount} />
             </div>
           </div>
-          <p className="text-center text-gray-400 text-[9px] sm:text-[10px] mt-1.5 sm:mt-2">Live counter updating in real-time</p>
+          <div className="flex items-center justify-center gap-1.5 mt-1.5 sm:mt-2">
+            {!isLoading && (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                <p className="text-center text-gray-400 text-[9px] sm:text-[10px]">Live updates enabled</p>
+              </>
+            )}
+            {isLoading && (
+              <p className="text-center text-gray-500 text-[9px] sm:text-[10px]">Connecting...</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
