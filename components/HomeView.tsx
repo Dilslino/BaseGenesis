@@ -91,6 +91,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
     setPasteError('');
     const trimmed = pasteAddress.trim();
     
+    // Null/empty check
+    if (!trimmed) {
+      setPasteError('Please enter a wallet address');
+      return;
+    }
+    
     if (!trimmed) {
       setPasteError('Please enter an address');
       return;

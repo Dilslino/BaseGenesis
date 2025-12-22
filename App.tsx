@@ -165,8 +165,10 @@ const App: React.FC = () => {
 
   // Start scan (connected wallet - saves to database)
   const handleStartScan = useCallback(async () => {
+    let addressToScan = walletAddress;
+    
     // If authenticated but no wallet address, try to connect wallet first
-    if (!walletAddress) {
+    if (!addressToScan) {
       console.warn('⚠️ No wallet address available, attempting to connect...');
       setScanError('Please connect your wallet first');
       
@@ -180,6 +182,7 @@ const App: React.FC = () => {
           }
           // Wallet connected, continue with scan
           setWalletAddress(address);
+          addressToScan = address; // Use the address directly, don't wait for state
         } catch (err: any) {
           console.error('Wallet connect error:', err);
           setScanError('Failed to connect wallet. Please try manually.');
@@ -191,17 +194,23 @@ const App: React.FC = () => {
       }
     }
     
+    // Safety check: ensure we have an address
+    if (!addressToScan) {
+      setScanError('No wallet address available');
+      return;
+    }
+    
     setIsScanning(true);
     setScanError(null);
     setIsPasteScan(false);
 
     try {
       await new Promise(r => setTimeout(r, 2000)); // Loading effect
-      const data = await getBaseGenesisData(walletAddress!);
+      const data = await getBaseGenesisData(addressToScan);
       setUserData(data);
       
       // Save scan to trigger real-time counter update (Firebase)
-      await saveScanFirebase(walletAddress!);
+      await saveScanFirebase(addressToScan);
       console.log('✅ Scan saved to Firebase for real-time counter');
       
       // Save to Supabase (only for connected wallets)
@@ -216,7 +225,7 @@ const App: React.FC = () => {
         const [leaderboard, total, position] = await Promise.all([
           getLeaderboard(50),
           getTotalUsers(),
-          getUserRankPosition(walletAddress!)
+          getUserRankPosition(addressToScan)
         ]);
         setLeaderboardData(leaderboard);
         setTotalUsers(total);
