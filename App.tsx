@@ -167,28 +167,58 @@ const App: React.FC = () => {
   const handleStartScan = useCallback(async () => {
     let addressToScan = walletAddress;
     
-    // If authenticated but no wallet address, try to connect wallet first
+    // Strategy: Get wallet address using multiple methods
+    // 1. Use existing walletAddress if available
+    // 2. If authenticated, try to get from Farcaster context
+    // 3. Fall back to wallet connection request
+    
     if (!addressToScan) {
-      console.warn('⚠️ No wallet address available, attempting to connect...');
-      setScanError('Please connect your wallet first');
-      
-      // Try to get wallet address via Farcaster wallet connection
-      if (isInFrame) {
+      if (isInFrame && isAuthenticated) {
+        console.log('🔍 Authenticated user, checking Farcaster context for wallet...');
+        
+        // Try to get wallet from Farcaster context directly
         try {
+          const context = await sdk.context;
+          
+          // Priority 1: Verified addresses
+          if (context?.user?.verifiedAddresses?.ethAddresses?.[0]) {
+            addressToScan = context.user.verifiedAddresses.ethAddresses[0];
+            setWalletAddress(addressToScan);
+            console.log('✅ Using verified address from Farcaster');
+          }
+          // Priority 2: Custody address
+          else if (context?.user?.custodyAddress) {
+            addressToScan = context.user.custodyAddress;
+            setWalletAddress(addressToScan);
+            console.log('✅ Using custody address from Farcaster');
+          }
+          // Priority 3: Request wallet connection
+          else {
+            console.log('ℹ️ No address in context, requesting wallet connection...');
+            const address = await connectFarcasterWallet();
+            if (!address) {
+              setScanError('Failed to get wallet address. Please try connecting manually.');
+              return;
+            }
+            addressToScan = address;
+            setWalletAddress(address);
+            console.log('✅ Wallet connected via SDK');
+          }
+        } catch (err: any) {
+          console.error('Error getting address from context:', err);
+          
+          // Fallback: try wallet connection
+          console.log('⚠️ Context failed, trying wallet connection...');
           const address = await connectFarcasterWallet();
           if (!address) {
             setScanError('Failed to get wallet address. Please try connecting manually.');
             return;
           }
-          // Wallet connected, continue with scan
+          addressToScan = address;
           setWalletAddress(address);
-          addressToScan = address; // Use the address directly, don't wait for state
-        } catch (err: any) {
-          console.error('Wallet connect error:', err);
-          setScanError('Failed to connect wallet. Please try manually.');
-          return;
         }
       } else {
+        // Not in Farcaster frame or not authenticated
         setScanError('Please connect your wallet first');
         return;
       }
@@ -199,6 +229,8 @@ const App: React.FC = () => {
       setScanError('No wallet address available');
       return;
     }
+    
+    console.log('🚀 Starting scan with address:', addressToScan.substring(0, 10) + '...');
     
     setIsScanning(true);
     setScanError(null);
@@ -241,7 +273,7 @@ const App: React.FC = () => {
     } finally {
       setIsScanning(false);
     }
-  }, [walletAddress, isConnected, user, isInFrame, connectFarcasterWallet]);
+  }, [walletAddress, isConnected, user, isInFrame, isAuthenticated, connectFarcasterWallet]);
 
   // Paste address scan (not connected - does NOT save to database but counts scan)
   const handlePasteAddressScan = useCallback(async (address: string) => {
@@ -410,6 +442,7 @@ const App: React.FC = () => {
             isScanning={isScanning}
             walletAddress={walletAddress}
             isAuthenticated={isAuthenticated}
+            userName={user?.username}
             onStartScan={handleStartScan}
             error={scanError || undefined}
           />
