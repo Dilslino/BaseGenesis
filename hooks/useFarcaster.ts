@@ -8,6 +8,8 @@ interface UseFarcasterResult {
   isAppAdded: boolean;
   user: FarcasterUser | null;
   walletAddress: string | null;
+  isAuthenticated: boolean;
+  authToken: string | null;
   error: string | null;
   // Actions
   connectWallet: () => Promise<string | null>;
@@ -22,6 +24,8 @@ export const useFarcaster = (): UseFarcasterResult => {
   const [isAppAdded, setIsAppAdded] = useState(false);
   const [user, setUser] = useState<FarcasterUser | null>(null);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authToken, setAuthToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,6 +48,22 @@ export const useFarcaster = (): UseFarcasterResult => {
             setWalletAddress(ethAddresses[0]);
           } else if (context.user.custodyAddress) {
             setWalletAddress(context.user.custodyAddress);
+          }
+          
+          // AUTO-AUTHENTICATE: Get Quick Auth token automatically
+          try {
+            console.log('🔐 Attempting auto-authentication with Quick Auth...');
+            const token = await sdk.quickAuth.getToken();
+            
+            if (token) {
+              setAuthToken(token);
+              setIsAuthenticated(true);
+              console.log('✅ Auto-authenticated successfully!');
+              console.log('📝 Auth token:', token.substring(0, 20) + '...');
+            }
+          } catch (authError) {
+            console.warn('⚠️ Auto-authentication failed:', authError);
+            // Don't set error state, auth is optional
           }
         }
         
@@ -155,6 +175,8 @@ export const useFarcaster = (): UseFarcasterResult => {
     isAppAdded,
     user,
     walletAddress,
+    isAuthenticated,
+    authToken,
     error,
     connectWallet,
     openUrl,

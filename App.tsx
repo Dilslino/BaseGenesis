@@ -55,6 +55,8 @@ const App: React.FC = () => {
     isAppAdded,
     user, 
     walletAddress: farcasterWallet,
+    isAuthenticated,
+    authToken,
     connectWallet: connectFarcasterWallet,
     shareToWarpcast, 
     openUrl,
@@ -68,13 +70,21 @@ const App: React.FC = () => {
   
   const { donate, isLoading: isDonating } = useDonate();
 
-  // Auto-connect if in Farcaster frame with wallet
+  // Auto-connect if in Farcaster frame with wallet OR authenticated
   useEffect(() => {
-    if (isLoaded && isInFrame && farcasterWallet) {
-      setWalletAddress(farcasterWallet);
+    if (isLoaded && isInFrame && (farcasterWallet || isAuthenticated)) {
+      // Use Farcaster wallet if available, otherwise user is just authenticated
+      if (farcasterWallet) {
+        setWalletAddress(farcasterWallet);
+      }
       setIsConnected(true);
+      
+      console.log('✅ Auto-connected via Farcaster');
+      console.log('  - User:', user?.username || 'Unknown');
+      console.log('  - Wallet:', farcasterWallet || 'Not shared');
+      console.log('  - Authenticated:', isAuthenticated);
     }
-  }, [isLoaded, isInFrame, farcasterWallet]);
+  }, [isLoaded, isInFrame, farcasterWallet, isAuthenticated, user]);
 
   // Sync AppKit wallet state
   useEffect(() => {
