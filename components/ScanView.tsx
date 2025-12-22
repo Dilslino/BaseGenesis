@@ -7,6 +7,7 @@ interface ScanViewProps {
   isConnected: boolean;
   isScanning: boolean;
   walletAddress: string | null;
+  isAuthenticated?: boolean;
   onStartScan: () => void;
   error?: string;
 }
@@ -15,6 +16,7 @@ export const ScanView: React.FC<ScanViewProps> = ({
   isConnected, 
   isScanning, 
   walletAddress,
+  isAuthenticated,
   onStartScan,
   error 
 }) => {
@@ -58,6 +60,16 @@ export const ScanView: React.FC<ScanViewProps> = ({
             <p className="text-[10px] text-gray-500 uppercase tracking-wider">Connected Wallet</p>
             <p className="text-white font-mono text-sm">{shortAddress}</p>
           </div>
+        </div>
+      )}
+      
+      {/* Authenticated but no wallet warning */}
+      {isConnected && isAuthenticated && !walletAddress && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 text-center">
+          <p className="text-yellow-400 text-sm font-medium mb-1">Wallet Not Connected</p>
+          <p className="text-yellow-400/80 text-xs">
+            Click "Start Scan" to connect your wallet and begin
+          </p>
         </div>
       )}
 

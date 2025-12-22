@@ -165,7 +165,31 @@ const App: React.FC = () => {
 
   // Start scan (connected wallet - saves to database)
   const handleStartScan = useCallback(async () => {
-    if (!walletAddress) return;
+    // If authenticated but no wallet address, try to connect wallet first
+    if (!walletAddress) {
+      console.warn('⚠️ No wallet address available, attempting to connect...');
+      setScanError('Please connect your wallet first');
+      
+      // Try to get wallet address via Farcaster wallet connection
+      if (isInFrame) {
+        try {
+          const address = await connectFarcasterWallet();
+          if (!address) {
+            setScanError('Failed to get wallet address. Please try connecting manually.');
+            return;
+          }
+          // Wallet connected, continue with scan
+          setWalletAddress(address);
+        } catch (err: any) {
+          console.error('Wallet connect error:', err);
+          setScanError('Failed to connect wallet. Please try manually.');
+          return;
+        }
+      } else {
+        setScanError('Please connect your wallet first');
+        return;
+      }
+    }
     
     setIsScanning(true);
     setScanError(null);
@@ -173,11 +197,11 @@ const App: React.FC = () => {
 
     try {
       await new Promise(r => setTimeout(r, 2000)); // Loading effect
-      const data = await getBaseGenesisData(walletAddress);
+      const data = await getBaseGenesisData(walletAddress!);
       setUserData(data);
       
       // Save scan to trigger real-time counter update (Firebase)
-      await saveScanFirebase(walletAddress);
+      await saveScanFirebase(walletAddress!);
       console.log('✅ Scan saved to Firebase for real-time counter');
       
       // Save to Supabase (only for connected wallets)
@@ -192,7 +216,7 @@ const App: React.FC = () => {
         const [leaderboard, total, position] = await Promise.all([
           getLeaderboard(50),
           getTotalUsers(),
-          getUserRankPosition(walletAddress)
+          getUserRankPosition(walletAddress!)
         ]);
         setLeaderboardData(leaderboard);
         setTotalUsers(total);
@@ -208,7 +232,7 @@ const App: React.FC = () => {
     } finally {
       setIsScanning(false);
     }
-  }, [walletAddress, isConnected, user]);
+  }, [walletAddress, isConnected, user, isInFrame, connectFarcasterWallet]);
 
   // Paste address scan (not connected - does NOT save to database but counts scan)
   const handlePasteAddressScan = useCallback(async (address: string) => {
@@ -376,6 +400,7 @@ const App: React.FC = () => {
             isConnected={isConnected}
             isScanning={isScanning}
             walletAddress={walletAddress}
+            isAuthenticated={isAuthenticated}
             onStartScan={handleStartScan}
             error={scanError || undefined}
           />
