@@ -133,13 +133,13 @@ export async function GET(
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          width: 560,
-          height: 354,
+          width: 680,
+          height: 450,
           background: 'rgba(255, 255, 255, 0.08)',
           backdropFilter: 'blur(20px)',
-          borderRadius: 32,
+          borderRadius: 40,
           border: '2px solid rgba(255, 255, 255, 0.15)',
-          padding: 32,
+          padding: 40,
           boxShadow: `0 0 60px ${rankConfig.glow}`,
           position: 'relative',
           overflow: 'hidden',
@@ -250,8 +250,12 @@ export async function GET(
       </div>
     ),
     { 
-      width: 1200, 
-      height: 630,
+      width: 1200,
+      height: 800,
+      headers: {
+        'Cache-Control': 'public, immutable, no-transform, max-age=3600',
+        'Content-Type': 'image/png',
+      },
     }
   )
 }
