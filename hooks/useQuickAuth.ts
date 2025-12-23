@@ -31,7 +31,10 @@ export const useQuickAuth = (): UseQuickAuthResult => {
 
     try {
       // Get JWT token from Farcaster Quick Auth
-      const { token } = await sdk.experimental.quickAuth.getToken();
+      const result = await sdk.quickAuth.getToken();
+      const token = typeof result === 'object' && result && 'token' in result 
+        ? (result as any).token 
+        : String(result);
       
       // Verify token with our backend
       const response = await fetch(`${BACKEND_URL}/api/auth`, {
