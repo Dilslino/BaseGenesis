@@ -52,9 +52,10 @@ export const useFarcaster = (): UseFarcasterResult => {
           // AUTO-AUTHENTICATE: Get Quick Auth token automatically
           try {
             console.log('🔐 Attempting auto-authentication with Quick Auth...');
-            const token = await sdk.quickAuth.getToken();
+            const result = await sdk.quickAuth.getToken();
             
-            if (token) {
+            if (result && typeof result === 'object' && 'token' in result) {
+              const token = (result as any).token as string;
               setAuthToken(token);
               setIsAuthenticated(true);
               console.log('✅ Auto-authenticated successfully!');
