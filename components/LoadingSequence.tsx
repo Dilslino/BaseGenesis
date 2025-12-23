@@ -1,24 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-const MESSAGES = [
-  { text: "Connecting to Base Network", icon: "🔗" },
-  { text: "Scanning Blockchain History", icon: "🔍" },
-  { text: "Analyzing Transactions", icon: "📊" },
-  { text: "Calculating Genesis Rank", icon: "⚡" },
-  { text: "Verifying On-Chain Data", icon: "✓" },
-  { text: "Generating Your Card", icon: "🎨" }
-];
-
 export const LoadingSequence: React.FC = () => {
-  const [msgIndex, setMsgIndex] = useState(0);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Message rotation
-    const interval = setInterval(() => {
-      setMsgIndex((prev) => (prev + 1) % MESSAGES.length);
-    }, 1200);
-    
     // Progress animation
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
@@ -28,13 +13,12 @@ export const LoadingSequence: React.FC = () => {
     }, 300);
     
     return () => {
-      clearInterval(interval);
       clearInterval(progressInterval);
     };
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-8 animate-fade-in">
+    <div className="flex flex-col items-center justify-center space-y-6 animate-fade-in">
       {/* Main Loader with Orbiting Particles */}
       <div className="relative w-32 h-32">
         {/* Outer glow ring */}
@@ -49,9 +33,7 @@ export const LoadingSequence: React.FC = () => {
              style={{ animationDuration: '2s', animationDirection: 'reverse' }}></div>
         
         {/* Center core with pulse */}
-        <div className="absolute inset-10 rounded-full bg-gradient-to-br from-base-blue to-purple-600 animate-pulse flex items-center justify-center shadow-[0_0_30px_rgba(0,82,255,0.5)]">
-          <span className="text-2xl animate-bounce">{MESSAGES[msgIndex].icon}</span>
-        </div>
+        <div className="absolute inset-10 rounded-full bg-gradient-to-br from-base-blue to-purple-600 animate-pulse shadow-[0_0_30px_rgba(0,82,255,0.5)]"></div>
         
         {/* Orbiting particles */}
         {[...Array(3)].map((_, i) => (
@@ -68,25 +50,6 @@ export const LoadingSequence: React.FC = () => {
         ))}
       </div>
       
-      {/* Status Text with smooth transition */}
-      <div className="h-8 flex flex-col items-center justify-center space-y-1">
-        <span 
-          key={msgIndex}
-          className="text-sm font-semibold text-white tracking-wide animate-fade-in-up"
-        >
-          {MESSAGES[msgIndex].text}
-        </span>
-        <div className="flex items-center gap-1">
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="w-1.5 h-1.5 rounded-full bg-base-blue animate-bounce"
-              style={{ animationDelay: `${i * 0.15}s` }}
-            />
-          ))}
-        </div>
-      </div>
-
       {/* Progress Bar with gradient */}
       <div className="w-56 space-y-2">
         <div className="h-1.5 bg-white/10 rounded-full overflow-hidden relative">
