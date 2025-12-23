@@ -325,8 +325,8 @@ const App: React.FC = () => {
     if (!userData) return;
     // Use dynamic share URL that generates card image
     const shareUrl = `https://basegenesis.vercel.app/share/${userData.address}`;
-    const fullText = `${text}\n\n${shareUrl}`;
-    await shareToWarpcast(fullText);
+    // Pass embedUrl so SDK will show preview card in composer
+    await shareToWarpcast(text, shareUrl);
   };
 
   // View on Basescan

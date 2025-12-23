@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     button: {
       title: "Check Your Genesis",
       action: {
-        type: "launch_frame",
+        type: "launch_miniapp",
         name: "BaseGenesis",
         url: "https://basegenesis.vercel.app",
         splashImageUrl: "https://basegenesis.vercel.app/logo.jpg",

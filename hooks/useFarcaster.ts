@@ -14,7 +14,7 @@ interface UseFarcasterResult {
   // Actions
   connectWallet: () => Promise<string | null>;
   openUrl: (url: string) => Promise<void>;
-  shareToWarpcast: (text: string) => Promise<void>;
+  shareToWarpcast: (text: string, embedUrl?: string) => Promise<void>;
   addMiniApp: () => Promise<boolean>;
 }
 
@@ -143,10 +143,40 @@ export const useFarcaster = (): UseFarcasterResult => {
     }
   }, [isInFrame]);
 
-  const shareToWarpcast = useCallback(async (text: string) => {
-    const shareUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}`;
-    await openUrl(shareUrl);
-  }, [openUrl]);
+  const shareToWarpcast = useCallback(async (text: string, embedUrl?: string) => {
+    try {
+      if (isInFrame && embedUrl) {
+        // Use SDK composeCast for better UX with embed preview
+        console.log('🎯 Opening composer with embed:', embedUrl);
+        await sdk.actions.composeCast({
+          text,
+          embeds: [embedUrl]
+        });
+      } else if (isInFrame) {
+        // Use SDK composeCast without embed
+        await sdk.actions.composeCast({
+          text
+        });
+      } else {
+        // Fallback to Warpcast URL for non-frame
+        const params = new URLSearchParams({ text });
+        if (embedUrl) {
+          params.append('embeds[]', embedUrl);
+        }
+        const shareUrl = `https://warpcast.com/~/compose?${params.toString()}`;
+        await openUrl(shareUrl);
+      }
+    } catch (err) {
+      console.error('Share error:', err);
+      // Fallback to URL method
+      const params = new URLSearchParams({ text });
+      if (embedUrl) {
+        params.append('embeds[]', embedUrl);
+      }
+      const shareUrl = `https://warpcast.com/~/compose?${params.toString()}`;
+      window.open(shareUrl, '_blank');
+    }
+  }, [isInFrame, openUrl]);
 
   const addMiniApp = useCallback(async (): Promise<boolean> => {
     try {
