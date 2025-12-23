@@ -67,12 +67,10 @@ export const useFarcaster = (): UseFarcasterResult => {
           }
         }
         
-        // Check if app is already added - try multiple properties
-        const isAdded = context?.client?.added || 
-                       context?.location?.type === 'app_home' ||
-                       false;
+        // Check if app is already added
+        const isAdded = context?.client?.added || false;
         setIsAppAdded(isAdded);
-        console.log('🔍 App added status:', isAdded, 'Context:', context?.client);
+        console.log('🔍 App added status:', isAdded, 'Location:', context?.location?.type);
         
         // Signal ready to Farcaster
         await sdk.actions.ready();
