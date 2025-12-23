@@ -66,6 +66,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ address: string }> }
 ) {
+  const startTime = Date.now();
+  
   // Rate limiting: 20 requests per minute per IP
   const clientIp = getClientIp(request);
   const rateLimit = checkRateLimit(clientIp, { limit: 20, windowSeconds: 60 });
@@ -84,13 +86,19 @@ export async function GET(
   const { address } = await params
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
   
+  console.log(`[Card API] Generating card for ${shortAddress}...`);
+  
   const walletData = await getWalletData(address)
+  
+  console.log(`[Card API] Data fetch took ${Date.now() - startTime}ms`);
   
   const rank = walletData?.rank || 'BASE CITIZEN'
   const rankConfig = RANK_CONFIG[rank] || RANK_CONFIG['BASE CITIZEN']
   const daysSinceJoined = walletData?.daysSinceJoined || 0
   const firstTxDate = walletData?.firstTxDate || 'Unknown'
   const blockNumber = walletData?.blockNumber || '0'
+  
+  console.log(`[Card API] Rendering card with rank: ${rank}`);
 
   return new ImageResponse(
     (

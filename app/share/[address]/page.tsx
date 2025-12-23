@@ -12,7 +12,7 @@ export default function SharePage({ params }: { params: Promise<{ address: strin
     // The meta tags will be served first for social previews
     const timer = setTimeout(() => {
       router.push(`/?address=${address}`)
-    }, 100)
+    }, 2000) // Delay 2s untuk allow crawlers to fetch metadata
     
     return () => clearTimeout(timer)
   }, [router, address])

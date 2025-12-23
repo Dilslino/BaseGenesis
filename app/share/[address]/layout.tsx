@@ -11,14 +11,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const shareUrl = `https://basegenesis.vercel.app/share/${address}`
 
   const miniAppEmbed = JSON.stringify({
-    version: "1",
+    version: "next",
     imageUrl: cardImageUrl,
     button: {
       title: "Check Your Genesis",
       action: {
-        type: "launch_miniapp",
+        type: "launch_frame",
         name: "BaseGenesis",
-        url: "https://basegenesis.vercel.app",
+        url: shareUrl,
         splashImageUrl: "https://basegenesis.vercel.app/logo.jpg",
         splashBackgroundColor: "#0f0c29"
       }
