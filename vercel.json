@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
-
   "headers": [
     {
       "source": "/.well-known/(.*)",
@@ -28,5 +27,4 @@
         }
       ]
     }
-  ],
-  "rewrites": [
+  ]
