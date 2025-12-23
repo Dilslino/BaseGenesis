@@ -7,9 +7,8 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { address } = await params
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
-  // Fallback to OG image until API route is fixed
-  // TODO: Fix API route for dynamic card generation
-  const cardImageUrl = `https://basegenesis.vercel.app/og-image.jpg`
+  // Dynamic card image via Next.js API route
+  const cardImageUrl = `https://basegenesis.vercel.app/api/card/${address}?v=3`
   const shareUrl = `https://basegenesis.vercel.app/share/${address}`
 
   const miniAppEmbed = JSON.stringify({
