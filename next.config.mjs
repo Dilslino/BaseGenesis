@@ -1,16 +1,8 @@
  /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  webpack: (config, { isServer }) => {
-    // Exclude test directories from webpack bundling
-    config.module.rules.push({
-      test: /node_modules\/.*\/test\//,
-      use: 'null-loader'
-    })
-    return config
-  },
-  // Externalize problematic dependencies
-  serverExternalPackages: ['thread-stream', 'pino', 'pino-pretty'],
+  // Externalize server-only deps to prevent Turbopack from bundling test files
+  serverExternalPackages: ['thread-stream', 'pino', 'pino-pretty', 'pino-abstract-transport'],
   images: {
     domains: ['basegenesis.vercel.app'],
   },
