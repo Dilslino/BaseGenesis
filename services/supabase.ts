@@ -61,7 +61,7 @@ export const saveUserProfile = async (
 };
 
 // Get leaderboard from database
-export const getLeaderboard = async (limit: number = 50): Promise<LeaderboardEntry[]> => {
+export const getLeaderboard = async (limit: number = 100): Promise<LeaderboardEntry[]> => {
   if (!supabase) {
     return [];
   }

@@ -105,7 +105,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [leaderboard, total] = await Promise.all([
-        getLeaderboard(50),
+        getLeaderboard(100),
         getTotalUsers()
       ]);
       setLeaderboardData(leaderboard);
@@ -261,7 +261,7 @@ const App: React.FC = () => {
         
         // Refresh leaderboard and get user position
         const [leaderboard, total, position] = await Promise.all([
-          getLeaderboard(50),
+          getLeaderboard(100),
           getTotalUsers(),
           getUserRankPosition(addressToScan)
         ]);
@@ -302,7 +302,7 @@ const App: React.FC = () => {
       
       // Refresh leaderboard
       const [leaderboard, total] = await Promise.all([
-        getLeaderboard(50),
+        getLeaderboard(100),
         getTotalUsers()
       ]);
       setLeaderboardData(leaderboard);
