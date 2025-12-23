@@ -116,6 +116,36 @@ export async function GET(
           background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)' 
         }} />
         
+        {/* Noise/Grain Texture Overlay - Simulated with dots pattern */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0.2,
+          background: `
+            repeating-linear-gradient(
+              0deg,
+              rgba(255, 255, 255, 0) 0px,
+              rgba(255, 255, 255, 0.03) 1px,
+              rgba(255, 255, 255, 0) 2px
+            ),
+            repeating-linear-gradient(
+              90deg,
+              rgba(255, 255, 255, 0) 0px,
+              rgba(255, 255, 255, 0.03) 1px,
+              rgba(255, 255, 255, 0) 2px
+            ),
+            repeating-linear-gradient(
+              45deg,
+              rgba(255, 255, 255, 0) 0px,
+              rgba(255, 255, 255, 0.02) 1px,
+              rgba(255, 255, 255, 0) 2px
+            )
+          `,
+        }} />
+        
         {/* Glow Effect */}
         <div style={{ 
           position: 'absolute', 
@@ -144,6 +174,30 @@ export async function GET(
           position: 'relative',
           overflow: 'hidden',
         }}>
+          {/* Card Noise Texture */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            opacity: 0.12,
+            background: `
+              repeating-linear-gradient(
+                0deg,
+                rgba(255, 255, 255, 0) 0px,
+                rgba(255, 255, 255, 0.05) 1px,
+                rgba(255, 255, 255, 0) 2px
+              ),
+              repeating-linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0px,
+                rgba(255, 255, 255, 0.05) 1px,
+                rgba(255, 255, 255, 0) 2px
+              )
+            `,
+          }} />
+          
           {/* Inner Glow */}
           <div style={{
             position: 'absolute',
