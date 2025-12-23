@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Award, Layers, Activity, ExternalLink, Share2, X } from 'lucide-react';
+import { Calendar, Award, Layers, Activity, ExternalLink, Share2, X, Heart } from 'lucide-react';
 import { UserGenesisData } from '../types';
 import { RANK_COLORS, RANK_EMOJI, RANK_BADGE_COLORS, RANK_DESCRIPTIONS } from '../constants';
 import { Achievements } from './Achievements';
@@ -9,9 +9,10 @@ interface ProfileViewProps {
   userData: UserGenesisData;
   onShareFarcaster: (text: string, url: string) => void;
   onViewBasescan: () => void;
+  onDonate: () => void;
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ userData, onShareFarcaster, onViewBasescan }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ userData, onShareFarcaster, onViewBasescan, onDonate }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const gradientColor = RANK_COLORS[userData.rank];
   const shortAddress = `${userData.address.slice(0, 6)}...${userData.address.slice(-4)}`;
@@ -103,20 +104,37 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ userData, onShareFarca
         </div>
       )}
 
-      {/* Actions */}
-      <div className="grid grid-cols-2 gap-2 mt-auto">
-        <Button 
-          variant="secondary" 
+      {/* Donate Button - Primary */}
+      <div className="mt-auto pt-2">
+        <button
+          onClick={onDonate}
+          className="w-full py-3.5 rounded-2xl font-semibold text-white text-sm
+            bg-gradient-to-r from-pink-500/80 via-purple-500/80 to-indigo-500/80
+            hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500
+            backdrop-blur-sm border border-white/10 hover:border-white/20
+            shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40
+            transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
+            flex items-center justify-center gap-2"
+        >
+          <Heart className="w-5 h-5" />
+          Support the Creator
+        </button>
+      </div>
+
+      {/* Secondary Actions */}
+      <div className="grid grid-cols-2 gap-2">
+        <Button
+          variant="secondary"
           onClick={() => setShowShareModal(true)}
-          className="!text-xs !py-2.5" 
+          className="!text-xs !py-2.5"
           icon={<Share2 className="w-4 h-4" />}
         >
           Share & Flex
         </Button>
-        <Button 
-          variant="secondary" 
+        <Button
+          variant="secondary"
           onClick={onViewBasescan}
-          className="!text-xs !py-2.5" 
+          className="!text-xs !py-2.5"
           icon={<ExternalLink className="w-4 h-4" />}
         >
           View on Chain
