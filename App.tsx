@@ -70,6 +70,11 @@ const App: React.FC = () => {
   
   const { donate, isLoading: isDonating } = useDonate();
 
+  // Debug: Log state changes
+  useEffect(() => {
+    console.log('🔍 Add Button State:', { isInFrame, isAppAdded, isLoaded });
+  }, [isInFrame, isAppAdded, isLoaded]);
+
   // Auto-connect if in Farcaster frame with wallet OR authenticated
   useEffect(() => {
     if (isLoaded && isInFrame && (farcasterWallet || isAuthenticated)) {
@@ -385,7 +390,7 @@ const App: React.FC = () => {
         
         <div className="flex items-center gap-2">
           {/* Add to Warpcast button */}
-          {isInFrame && !isAppAdded && (
+          {isLoaded && isInFrame && !isAppAdded && (
             <button
               onClick={addMiniApp}
               className="px-3 py-1.5 rounded-lg text-xs font-medium

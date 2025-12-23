@@ -67,10 +67,12 @@ export const useFarcaster = (): UseFarcasterResult => {
           }
         }
         
-        // Check if app is already added
-        if (context?.client?.added) {
-          setIsAppAdded(true);
-        }
+        // Check if app is already added - try multiple properties
+        const isAdded = context?.client?.added || 
+                       context?.location?.type === 'app_home' ||
+                       false;
+        setIsAppAdded(isAdded);
+        console.log('🔍 App added status:', isAdded, 'Context:', context?.client);
         
         // Signal ready to Farcaster
         await sdk.actions.ready();
@@ -153,11 +155,19 @@ export const useFarcaster = (): UseFarcasterResult => {
         return false;
       }
       
+      console.log('🎯 Calling sdk.actions.addMiniApp()...');
       await sdk.actions.addMiniApp();
+      console.log('✅ Add mini app successful!');
       setIsAppAdded(true);
       return true;
     } catch (err: any) {
       console.error('Add mini app error:', err);
+      console.error('Error details:', {
+        message: err.message,
+        name: err.name,
+        stack: err.stack
+      });
+      
       if (err.message?.includes('RejectedByUser')) {
         setError('User rejected adding the app');
       } else if (err.message?.includes('InvalidDomainManifestJson')) {
