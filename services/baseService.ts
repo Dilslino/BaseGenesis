@@ -47,14 +47,13 @@ const calculateAchievements = (
 
 export const getBaseGenesisData = async (address: string): Promise<UserGenesisData> => {
   try {
-    if (!address.startsWith('0x') || address.length !== 42) {
-    // Null safety check
     if (!address) {
       throw new Error("Address is required.");
     }
     
     // Validate Ethereum address format
     if (!address.startsWith('0x') || address.length !== 42) {
+      throw new Error("Invalid Ethereum address format.");
     }
 
     // Get first transaction
