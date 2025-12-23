@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useAppKit, useAppKitAccount, useDisconnect } from '@reown/appkit/react';
 import { Heart } from 'lucide-react';
+import sdk from '@farcaster/frame-sdk';
 import { Button } from './components/Button';
 import { FlexCard } from './components/FlexCard';
 import { BottomNav, TabType } from './components/BottomNav';
