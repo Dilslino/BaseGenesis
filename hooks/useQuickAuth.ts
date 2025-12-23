@@ -15,7 +15,7 @@ interface UseQuickAuthResult extends AuthState {
   authenticatedFetch: (url: string, options?: RequestInit) => Promise<Response>;
 }
 
-const BACKEND_URL = import.meta.env.VITE_APP_URL || 'https://basegenesis.vercel.app';
+const BACKEND_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://basegenesis.vercel.app';
 
 export const useQuickAuth = (): UseQuickAuthResult => {
   const [state, setState] = useState<AuthState>({
