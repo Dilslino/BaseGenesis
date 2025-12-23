@@ -42,12 +42,11 @@ export const useFarcaster = (): UseFarcasterResult => {
             pfpUrl: context.user.pfpUrl,
           });
 
-          // Try to get wallet address from verified addresses or custody
-          const ethAddresses = context.user.verifiedAddresses?.ethAddresses;
-          if (ethAddresses && ethAddresses.length > 0) {
-            setWalletAddress(ethAddresses[0]);
-          } else if (context.user.custodyAddress) {
-            setWalletAddress(context.user.custodyAddress);
+          // Try to get wallet address from custody address
+          // Note: Farcaster SDK context.user only provides basic info
+          // Wallet address needs to be requested via connectWallet()
+          if ((context.user as any).custodyAddress) {
+            setWalletAddress((context.user as any).custodyAddress);
           }
           
           // AUTO-AUTHENTICATE: Get Quick Auth token automatically
