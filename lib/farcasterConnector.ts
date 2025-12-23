@@ -11,16 +11,22 @@ export function farcasterFrame() {
     name: 'Farcaster Frame',
     type: 'farcaster-frame' as const,
 
-    async connect(parameters?: { chainId?: number; isReconnecting?: boolean }) {
+    async connect<withCapabilities extends boolean = false>(
+      parameters?: { 
+        chainId?: number; 
+        isReconnecting?: boolean;
+        withCapabilities?: withCapabilities;
+      }
+    ) {
       const provider = await this.getProvider();
       const accounts = await provider.request({ method: 'eth_requestAccounts' }) as string[];
       account = accounts[0];
       connected = true;
       
       return {
-        accounts: accounts as readonly `0x${string}`[],
+        accounts: accounts as any,
         chainId: base.id,
-      };
+      } as any;
     },
 
     async disconnect() {
