@@ -1,5 +1,9 @@
 {
   "framework": "nextjs",
+  "buildCommand": "next build",
+  "env": {
+    "TURBOPACK": "0"
+  },
   "headers": [
     {
       "source": "/.well-known/(.*)",
