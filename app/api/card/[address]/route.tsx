@@ -230,16 +230,6 @@ export async function GET(
             </div>
           </div>
 
-          {/* Footer Branding */}
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 8, 
-            marginTop: 24,
-          }}>
-            <div style={{ width: 10, height: 10, borderRadius: 9999, background: '#0052FF', display: 'flex' }} />
-            <span style={{ color: '#64748b', fontSize: 16 }}>basegenesis.vercel.app</span>
-          </div>
         </div>
       ),
       { 
