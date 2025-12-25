@@ -3,9 +3,14 @@
  *
  * This module provides a single Supabase client that works in both
  * client-side (Vite) and server-side (Next.js) environments.
+ * Uses lazy initialization to avoid build-time errors with Node 18.
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+// Create singleton client with lazy initialization
+let supabaseInstance: SupabaseClient | null = null;
+let initialized = false;
 
 // Detect environment and get appropriate credentials
 function getSupabaseCredentials(): { url: string; key: string } | null {
@@ -33,32 +38,54 @@ function getSupabaseCredentials(): { url: string; key: string } | null {
   return null;
 }
 
-// Create singleton client
-let supabaseInstance: SupabaseClient | null = null;
-
-function getSupabaseClient(): SupabaseClient | null {
-  if (supabaseInstance) {
+/**
+ * Get Supabase client (lazy initialization)
+ * Returns null if credentials are not available
+ */
+export function getSupabaseClient(): SupabaseClient | null {
+  // Return cached instance if available
+  if (initialized) {
     return supabaseInstance;
   }
 
-  const credentials = getSupabaseCredentials();
+  initialized = true;
 
-  if (!credentials) {
-    console.warn('⚠️ Supabase credentials not found. Database operations will be disabled.');
+  try {
+    const credentials = getSupabaseCredentials();
+
+    if (!credentials) {
+      console.warn('⚠️ Supabase credentials not found. Database operations will be disabled.');
+      return null;
+    }
+
+    supabaseInstance = createClient(credentials.url, credentials.key, {
+      auth: {
+        persistSession: typeof window !== 'undefined', // Only persist on client
+      }
+    });
+
+    return supabaseInstance;
+  } catch (error) {
+    console.warn('⚠️ Failed to initialize Supabase:', error);
     return null;
   }
-
-  supabaseInstance = createClient(credentials.url, credentials.key, {
-    auth: {
-      persistSession: typeof window !== 'undefined', // Only persist on client
-    }
-  });
-
-  return supabaseInstance;
 }
 
-// Export the client (may be null if credentials not found)
-export const supabase = getSupabaseClient();
+// Export a proxy object that lazily gets the client
+// This prevents initialization at import time
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_, prop) {
+    const client = getSupabaseClient();
+    if (!client) {
+      // Return a no-op function for method calls when client is null
+      if (typeof prop === 'string') {
+        return () => Promise.resolve({ data: null, error: { message: 'Supabase not initialized' } });
+      }
+      return undefined;
+    }
+    return (client as any)[prop];
+  }
+});
 
 // Re-export types and utilities from services/supabase.ts for backwards compatibility
 export type { UserProfile } from '../services/supabase';

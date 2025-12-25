@@ -1,5 +1,5 @@
 import { UserGenesisData, UserRank, LeaderboardEntry } from '../types';
-import { supabase } from '../lib/supabase';
+import { getSupabaseClient } from '../lib/supabase';
 
 export interface UserProfile {
   id?: string;
@@ -22,6 +22,7 @@ export const saveUserProfile = async (
   userData: UserGenesisData,
   farcasterUser?: { username?: string; pfpUrl?: string; fid?: number }
 ): Promise<boolean> => {
+  const supabase = getSupabaseClient();
   if (!supabase) {
     console.warn('Supabase not initialized, skipping profile save');
     return false;
@@ -62,6 +63,7 @@ export const saveUserProfile = async (
 
 // Get leaderboard from database
 export const getLeaderboard = async (limit: number = 100): Promise<LeaderboardEntry[]> => {
+  const supabase = getSupabaseClient();
   if (!supabase) {
     return [];
   }
@@ -96,6 +98,7 @@ export const getLeaderboard = async (limit: number = 100): Promise<LeaderboardEn
 
 // Get total user count
 export const getTotalUsers = async (): Promise<number> => {
+  const supabase = getSupabaseClient();
   if (!supabase) {
     return 0;
   }
@@ -119,6 +122,7 @@ export const getTotalUsers = async (): Promise<number> => {
 
 // Get user rank position
 export const getUserRankPosition = async (address: string): Promise<number | null> => {
+  const supabase = getSupabaseClient();
   if (!supabase) {
     return null;
   }
@@ -148,6 +152,7 @@ export const getUserRankPosition = async (address: string): Promise<number | nul
 
 // Save a scan record (called when user scans wallet)
 export const saveScan = async (walletAddress: string): Promise<boolean> => {
+  const supabase = getSupabaseClient();
   if (!supabase) {
     return false;
   }
@@ -171,6 +176,7 @@ export const saveScan = async (walletAddress: string): Promise<boolean> => {
 
 // Get total scans from global_stats
 export const getTotalScans = async (): Promise<number> => {
+  const supabase = getSupabaseClient();
   if (!supabase) {
     return 0;
   }
@@ -199,6 +205,7 @@ export const getTotalScans = async (): Promise<number> => {
 export const subscribeToScanCount = (
   onUpdate: (count: number) => void
 ): (() => void) => {
+  const supabase = getSupabaseClient();
   if (!supabase) {
     return () => {}; // Return no-op unsubscribe
   }

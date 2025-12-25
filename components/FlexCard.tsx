@@ -1,13 +1,22 @@
-import React from 'react';
+'use client';
+
+import React, { useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { UserGenesisData, UserRank } from '../types';
 import { RANK_COLORS } from '../constants';
-import { Hash, Calendar, Layers, Crown, Trophy, Sparkles, Zap, Globe } from 'lucide-react';
+import { Hash, Calendar, Layers, Crown, Trophy, Zap, Globe, Sparkles } from 'lucide-react';
 
 interface FlexCardProps {
   data: UserGenesisData;
+  compact?: boolean;
 }
 
-export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
+export const FlexCard: React.FC<FlexCardProps> = ({ data, compact = false }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
   const dateObj = new Date(data.firstTxDate);
   const formattedDate = dateObj.toLocaleDateString('en-US', { 
     year: '2-digit', 
@@ -22,15 +31,61 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
   const isSettler = data.rank === UserRank.EARLY_SETTLER;
   const isCitizen = data.rank === UserRank.BASE_CITIZEN;
 
+  // 3D Tilt effect handlers
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    
+    const rect = cardRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const mouseX = e.clientX - centerX;
+    const mouseY = e.clientY - centerY;
+    
+    // Normalize to -1 to 1
+    const rotateXValue = (mouseY / (rect.height / 2)) * -8;
+    const rotateYValue = (mouseX / (rect.width / 2)) * 8;
+    
+    setRotateX(rotateXValue);
+    setRotateY(rotateYValue);
+  };
+
+  const handleMouseLeave = () => {
+    setRotateX(0);
+    setRotateY(0);
+    setIsHovered(false);
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
   return (
-    <div className={`relative w-full aspect-[1.58/1] max-w-[320px] mx-auto perspective-1000 group select-none ${isOG || isPioneer ? 'float-animation' : ''}`}>
+    <motion.div 
+      ref={cardRef}
+      className={`relative w-full aspect-[1.58/1] ${compact ? 'max-w-[280px]' : 'max-w-[320px]'} mx-auto perspective-1000 group select-none`}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onMouseEnter={handleMouseEnter}
+      initial={{ opacity: 0, y: 20, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+      style={{
+        transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+        transition: isHovered ? 'none' : 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+      }}
+    >
       
       {/* Animated Glow Behind */}
-      <div className={`absolute -inset-1 bg-gradient-to-r ${gradientColor} rounded-2xl blur-lg transition duration-700 ${
-        isOG ? 'opacity-70 group-hover:opacity-90' : 
-        isPioneer ? 'opacity-50 group-hover:opacity-70' : 
-        'opacity-40 group-hover:opacity-60'
-      }`}></div>
+      <motion.div 
+        className={`absolute -inset-1 bg-gradient-to-r ${gradientColor} rounded-2xl blur-lg`}
+        animate={{
+          opacity: isHovered 
+            ? (isOG ? 0.9 : isPioneer ? 0.7 : 0.6) 
+            : (isOG ? 0.7 : isPioneer ? 0.5 : 0.4)
+        }}
+        transition={{ duration: 0.3 }}
+      />
       
       {/* OG Special Effects */}
       {isOG && (
@@ -38,36 +93,68 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
           {/* Rotating ring */}
           <div className="absolute -inset-3 rounded-2xl border-2 border-dashed border-yellow-500/30 animate-[rotate-slow_20s_linear_infinite]"></div>
           {/* Outer glow pulse */}
-          <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-2xl blur-2xl opacity-40 animate-pulse"></div>
+          <motion.div 
+            className="absolute -inset-2 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-2xl blur-2xl"
+            animate={{ opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
           {/* Top shine line */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full animate-pulse"></div>
+          <motion.div 
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
           {/* Sparkle particles */}
-          <div className="absolute -top-2 -left-2 sparkle-particle">
+          <motion.div 
+            className="absolute -top-2 -left-2"
+            animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5], rotate: [0, 180, 360] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             <Sparkles className="w-4 h-4 text-yellow-400" />
-          </div>
-          <div className="absolute -top-1 -right-3 sparkle-particle" style={{ animationDelay: '0.5s' }}>
+          </motion.div>
+          <motion.div 
+            className="absolute -top-1 -right-3"
+            animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5], rotate: [0, 180, 360] }}
+            transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+          >
             <Sparkles className="w-3 h-3 text-orange-400" />
-          </div>
-          <div className="absolute -bottom-2 -right-1 sparkle-particle" style={{ animationDelay: '1s' }}>
+          </motion.div>
+          <motion.div 
+            className="absolute -bottom-2 -right-1"
+            animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5], rotate: [0, 180, 360] }}
+            transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+          >
             <Sparkles className="w-4 h-4 text-yellow-300" />
-          </div>
+          </motion.div>
         </>
       )}
 
       {/* Pioneer Special Effects */}
       {isPioneer && (
         <>
-          <div className="absolute -inset-1 bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-400 rounded-2xl blur-xl opacity-30 animate-pulse"></div>
-          <div className="absolute -top-1 -right-1 sparkle-particle">
+          <motion.div 
+            className="absolute -inset-1 bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-400 rounded-2xl blur-xl"
+            animate={{ opacity: [0.2, 0.35, 0.2] }}
+            transition={{ duration: 2.5, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute -top-1 -right-1"
+            animate={{ y: [0, -5, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             <Trophy className="w-4 h-4 text-amber-400" />
-          </div>
+          </motion.div>
         </>
       )}
 
       {/* Settler Special Effects */}
       {isSettler && (
         <>
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-500 rounded-2xl blur-md opacity-25 group-hover:opacity-40 transition-opacity duration-500"></div>
+          <motion.div 
+            className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-500 rounded-2xl blur-md"
+            animate={{ opacity: isHovered ? 0.4 : 0.25 }}
+            transition={{ duration: 0.3 }}
+          />
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full opacity-60"></div>
         </>
       )}
@@ -75,7 +162,11 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
       {/* Citizen Special Effects */}
       {isCitizen && (
         <>
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-slate-500 via-gray-400 to-slate-500 rounded-2xl blur-md opacity-20 group-hover:opacity-35 transition-opacity duration-500"></div>
+          <motion.div 
+            className="absolute -inset-0.5 bg-gradient-to-r from-slate-500 via-gray-400 to-slate-500 rounded-2xl blur-md"
+            animate={{ opacity: isHovered ? 0.35 : 0.2 }}
+            transition={{ duration: 0.3 }}
+          />
         </>
       )}
       
@@ -89,34 +180,49 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
         
         {/* Background Noise/Texture */}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
-        <div className={`absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br ${gradientColor} blur-[60px] ${isOG ? 'opacity-60' : isPioneer ? 'opacity-40' : 'opacity-30'} rounded-full`}></div>
+        <motion.div 
+          className={`absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br ${gradientColor} blur-[60px] rounded-full`}
+          animate={{ opacity: isOG ? 0.6 : isPioneer ? 0.4 : 0.3 }}
+        />
         
-        {/* OG Crown decoration */}
+        {/* Rank decoration icons */}
         {isOG && (
-          <div className="absolute top-2 right-2 crown-icon">
-            <Crown className="w-7 h-7 text-yellow-400" />
-          </div>
+          <motion.div 
+            className="absolute top-2 right-2"
+            animate={{ y: [0, -5, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <Crown className="w-7 h-7 text-yellow-400 drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]" />
+          </motion.div>
         )}
 
-        {/* Pioneer Trophy decoration */}
         {isPioneer && (
-          <div className="absolute top-2 right-2 float-animation">
+          <motion.div 
+            className="absolute top-2 right-2"
+            animate={{ y: [0, -3, 0] }}
+            transition={{ duration: 2.5, repeat: Infinity }}
+          >
             <Trophy className="w-6 h-6 text-amber-400 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]" />
-          </div>
+          </motion.div>
         )}
 
-        {/* Settler Zap decoration */}
         {isSettler && (
-          <div className="absolute top-2 right-2 animate-pulse">
+          <motion.div 
+            className="absolute top-2 right-2"
+            animate={{ opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
             <Zap className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_4px_rgba(6,182,212,0.6)]" />
-          </div>
+          </motion.div>
         )}
 
-        {/* Citizen Globe decoration */}
         {isCitizen && (
-          <div className="absolute top-2 right-2 opacity-70 group-hover:opacity-100 transition-opacity">
+          <motion.div 
+            className="absolute top-2 right-2"
+            animate={{ opacity: isHovered ? 1 : 0.7 }}
+          >
             <Globe className="w-5 h-5 text-slate-400 drop-shadow-[0_0_3px_rgba(148,163,184,0.5)]" />
-          </div>
+          </motion.div>
         )}
 
         {/* Top Row: Brand & Chip */}
@@ -138,7 +244,7 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
         {/* Middle: Rank */}
         <div className="z-10 relative my-1 sm:my-2">
             <h2 className={`text-2xl min-[340px]:text-3xl font-black italic tracking-tighter drop-shadow-lg truncate ${
-              isOG ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-500 og-title' : 
+              isOG ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-500 og-title animate-gradient-shift' : 
               isPioneer ? 'text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-yellow-500' :
               isSettler ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-400 to-cyan-500' :
               'text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-gray-300 to-slate-400'
@@ -149,43 +255,64 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data }) => {
               {isCitizen && <span className="mr-1">🌐</span>}
               {data.rank.split(' ')[0]} <span className="text-lg sm:text-2xl">{data.rank.split(' ')[1]}</span>
             </h2>
-            <div className={`h-0.5 bg-gradient-to-r mt-1 ${
-              isOG ? 'from-yellow-400 via-orange-500 to-transparent w-20' : 
-              isPioneer ? 'from-amber-400 via-orange-400 to-transparent w-16' :
-              isSettler ? 'from-cyan-400 via-teal-400 to-transparent w-14' :
-              'from-slate-400 via-gray-500 to-transparent w-12'
-            }`}></div>
+            <motion.div 
+              className={`h-0.5 bg-gradient-to-r mt-1 ${
+                isOG ? 'from-yellow-400 via-orange-500 to-transparent w-20' : 
+                isPioneer ? 'from-amber-400 via-orange-400 to-transparent w-16' :
+                isSettler ? 'from-cyan-400 via-teal-400 to-transparent w-14' :
+                'from-slate-400 via-gray-500 to-transparent w-12'
+              }`}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              style={{ transformOrigin: 'left' }}
+            />
         </div>
 
         {/* Bottom: Stats Grid */}
         <div className="grid grid-cols-2 gap-2 z-10">
             {/* Join Date */}
-            <div className="flex flex-col">
+            <motion.div 
+              className="flex flex-col"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
                 <div className="flex items-center gap-1 text-[8px] sm:text-[9px] text-gray-400 font-mono uppercase">
                     <Calendar className="w-3 h-3" /> Joined
                 </div>
                 <div className="text-[10px] sm:text-xs font-mono text-white font-bold">{formattedDate}</div>
-            </div>
+            </motion.div>
             
             {/* Block */}
-            <div className="flex flex-col items-end text-right">
+            <motion.div 
+              className="flex flex-col items-end text-right"
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+            >
                 <div className="flex items-center gap-1 text-[8px] sm:text-[9px] text-gray-400 font-mono uppercase">
                     Block <Layers className="w-3 h-3" />
                 </div>
                 <div className="text-[10px] sm:text-xs font-mono text-white">#{data.blockNumber}</div>
-            </div>
+            </motion.div>
 
             {/* Hash - Full Width */}
-            <div className="col-span-2 pt-2 border-t border-white/5 flex justify-between items-center mt-1">
+            <motion.div 
+              className="col-span-2 pt-2 border-t border-white/5 flex justify-between items-center mt-1"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
                  <div className="flex items-center gap-1 text-[8px] sm:text-[9px] text-gray-500 font-mono">
                     <Hash className="w-3 h-3" /> GENESIS TX
                  </div>
-                 <div className="text-[9px] sm:text-[10px] font-mono text-base-blue bg-base-blue/10 px-2 py-0.5 rounded border border-base-blue/20">
+                 <div className="text-[9px] sm:text-[10px] font-mono text-base-blue bg-base-blue/10 px-2 py-0.5 rounded border border-base-blue/20 hover:bg-base-blue/20 transition-colors cursor-pointer">
                     {shortHash}
                  </div>
-            </div>
+            </motion.div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

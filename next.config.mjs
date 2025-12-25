@@ -21,7 +21,7 @@ const nextConfig = {
       },
     ]
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
       '@solana/kit': false,

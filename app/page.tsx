@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAppKit, useAppKitAccount, useDisconnect } from '@reown/appkit/react';
 import { BottomNav, TabType } from '../components/BottomNav';
 import { HomeView } from '../components/HomeView';
@@ -377,85 +378,139 @@ export default function Home() {
       {/* Main Content */}
       <main className="flex-grow flex flex-col px-4 py-4 relative z-10 overflow-y-auto no-scrollbar">
         
-        {/* Home Tab */}
-        {activeTab === 'home' && (
-          <HomeView
-            isConnected={isConnected}
-            isConnecting={isConnecting}
-            walletAddress={walletAddress}
-            isInFrame={isInFrame}
-            username={user?.username}
-            pfpUrl={user?.pfpUrl}
-            totalUsers={totalUsers}
-            onConnect={handleConnect}
-            onDisconnect={handleDisconnect}
-            onNavigateToScan={() => setActiveTab('scan')}
-            onPasteAddressScan={handlePasteAddressScan}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {/* Home Tab */}
+          {activeTab === 'home' && (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+              className="flex-grow flex flex-col"
+            >
+              <HomeView
+                isConnected={isConnected}
+                isConnecting={isConnecting}
+                walletAddress={walletAddress}
+                isInFrame={isInFrame}
+                username={user?.username}
+                pfpUrl={user?.pfpUrl}
+                totalUsers={totalUsers}
+                userData={userData}
+                onConnect={handleConnect}
+                onDisconnect={handleDisconnect}
+                onNavigateToScan={() => setActiveTab('scan')}
+                onNavigateToProfile={() => setActiveTab('profile')}
+                onPasteAddressScan={handlePasteAddressScan}
+              />
+            </motion.div>
+          )}
 
-        {/* Scan Tab */}
-        {activeTab === 'scan' && (
-          <ScanView
-            isConnected={isConnected}
-            isScanning={isScanning}
-            walletAddress={walletAddress}
-            onStartScan={handleStartScan}
-            error={scanError || undefined}
-          />
-        )}
+          {/* Scan Tab */}
+          {activeTab === 'scan' && (
+            <motion.div
+              key="scan"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+              className="flex-grow flex flex-col"
+            >
+              <ScanView
+                isConnected={isConnected}
+                isScanning={isScanning}
+                walletAddress={walletAddress}
+                onStartScan={handleStartScan}
+                error={scanError || undefined}
+              />
+            </motion.div>
+          )}
 
-        {/* Leaderboard Tab */}
-        {activeTab === 'leaderboard' && (
-          <Leaderboard
-            entries={leaderboardData}
-            userRank={userRankPosition || undefined}
-            userAddress={walletAddress || undefined}
-          />
-        )}
+          {/* Leaderboard Tab */}
+          {activeTab === 'leaderboard' && (
+            <motion.div
+              key="leaderboard"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+              className="flex-grow flex flex-col"
+            >
+              <Leaderboard
+                entries={leaderboardData}
+                userRank={userRankPosition || undefined}
+                userAddress={walletAddress || undefined}
+              />
+            </motion.div>
+          )}
 
-        {/* Profile Tab */}
-        {activeTab === 'profile' && userData && (
-          <div className="flex flex-col h-full space-y-4">
-            {/* Paste Scan Notice */}
-            {isPasteScan && (
-              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 text-center">
-                <p className="text-yellow-400 text-xs">
-                  This is a preview scan. Connect wallet to save to leaderboard.
-                </p>
+          {/* Profile Tab */}
+          {activeTab === 'profile' && userData && (
+            <motion.div
+              key="profile"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col h-full space-y-4"
+            >
+              {/* Paste Scan Notice */}
+              {isPasteScan && (
+                <motion.div 
+                  className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 text-center"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <p className="text-yellow-400 text-xs">
+                    This is a preview scan. Connect wallet to save to leaderboard.
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Card */}
+              <div className="flex justify-center">
+                <FlexCard data={userData} />
               </div>
-            )}
+              
+              {/* Profile Info */}
+              <ProfileView
+                userData={userData}
+                onShareFarcaster={handleShare}
+                onViewBasescan={handleViewBasescan}
+                onDonate={() => setShowDonateModal(true)}
+              />
+            </motion.div>
+          )}
 
-            {/* Card */}
-            <div className="flex justify-center">
-              <FlexCard data={userData} />
-            </div>
-            
-            {/* Profile Info */}
-            <ProfileView
-              userData={userData}
-              onShareFarcaster={handleShare}
-              onViewBasescan={handleViewBasescan}
-              onDonate={() => setShowDonateModal(true)}
-            />
-          </div>
-        )}
-
-        {/* Profile Tab - Not Scanned Yet */}
-        {activeTab === 'profile' && !userData && (
-          <div className="flex-grow flex flex-col items-center justify-center text-center space-y-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center">
-              <span className="text-3xl">🔍</span>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-white mb-1">No Profile Yet</h3>
-              <p className="text-gray-400 text-sm">Scan your wallet first to see your profile</p>
-            </div>
-            <Button variant="primary" onClick={() => setActiveTab('scan')} className="!px-6">
-              Go to Scan
-            </Button>
-          </div>
-        )}
+          {/* Profile Tab - Not Scanned Yet */}
+          {activeTab === 'profile' && !userData && (
+            <motion.div
+              key="profile-empty"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              className="flex-grow flex flex-col items-center justify-center text-center space-y-4"
+            >
+              <motion.div 
+                className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center"
+                initial={{ rotate: -10 }}
+                animate={{ rotate: 0 }}
+                transition={{ type: "spring", stiffness: 200 }}
+              >
+                <span className="text-3xl">🔍</span>
+              </motion.div>
+              <div>
+                <h3 className="text-lg font-bold text-white mb-1">No Profile Yet</h3>
+                <p className="text-gray-400 text-sm">Scan your wallet first to see your profile</p>
+              </div>
+              <Button variant="primary" onClick={() => setActiveTab('scan')} className="!px-6">
+                Go to Scan
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
       {/* Bottom Navigation */}

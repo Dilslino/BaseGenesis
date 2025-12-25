@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
-import { Scan, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Scan } from 'lucide-react';
 import { Button } from './Button';
 import { LoadingSequence } from './LoadingSequence';
 
@@ -24,64 +27,168 @@ export const ScanView: React.FC<ScanViewProps> = ({
 
   if (isScanning) {
     return (
-      <div className="flex-grow flex flex-col items-center justify-center">
+      <motion.div 
+        className="flex-grow flex flex-col items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
         <LoadingSequence />
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="flex-grow flex flex-col items-center justify-center space-y-6 animate-fade-in px-4">
+    <motion.div 
+      className="flex-grow flex flex-col items-center justify-center space-y-6 px-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
       {/* Scan Icon */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-base-blue/20 blur-2xl rounded-full" />
-        <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-base-blue to-purple-600 flex items-center justify-center">
+      <motion.div 
+        className="relative"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", damping: 15, stiffness: 200, delay: 0.1 }}
+      >
+        {/* Glow effect */}
+        <motion.div 
+          className="absolute inset-0 bg-base-blue/20 blur-2xl rounded-full"
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{ duration: 2, repeat: Infinity }}
+        />
+        
+        {/* Pulse rings */}
+        <motion.div 
+          className="absolute inset-0 rounded-2xl border-2 border-base-blue/30"
+          animate={{ 
+            scale: [1, 1.5],
+            opacity: [0.5, 0]
+          }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        />
+        <motion.div 
+          className="absolute inset-0 rounded-2xl border-2 border-base-blue/30"
+          animate={{ 
+            scale: [1, 1.5],
+            opacity: [0.5, 0]
+          }}
+          transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+        />
+        
+        {/* Main icon container */}
+        <motion.div 
+          className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-base-blue to-purple-600 flex items-center justify-center shadow-xl shadow-base-blue/30"
+          whileHover={{ scale: 1.05, rotate: 5 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <Scan className="w-12 h-12 text-white" />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Info */}
-      <div className="text-center space-y-2">
+      <motion.div 
+        className="text-center space-y-2"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
         <h2 className="text-xl font-bold text-white">Ready to Scan</h2>
         <p className="text-gray-400 text-sm max-w-[280px]">
           Analyze your wallet to discover when you first joined Base blockchain
         </p>
-      </div>
+      </motion.div>
 
       {/* Connected Wallet */}
       {(isConnected || walletAddress) && walletAddress && (
-        <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3">
+        <motion.div 
+          className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3 }}
+        >
           <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full bg-green-500" />
+            <motion.div 
+              className="w-2 h-2 rounded-full bg-green-500"
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
           </div>
           <div>
             <p className="text-[10px] text-gray-500 uppercase tracking-wider">Connected Wallet</p>
             <p className="text-white font-mono text-sm">{shortAddress}</p>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Error */}
       {error && (
-        <div className="bg-red-900/20 border border-red-500/30 rounded-xl px-4 py-3 text-center">
+        <motion.div 
+          className="bg-red-900/20 border border-red-500/30 rounded-xl px-4 py-3 text-center"
+          initial={{ opacity: 0, scale: 0.9, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+        >
           <p className="text-red-400 text-sm">{error}</p>
-        </div>
+        </motion.div>
       )}
 
       {/* Scan Button */}
-      <Button
-        variant="mint"
-        onClick={onStartScan}
-        disabled={!isConnected && !walletAddress}
-        className="!px-8 !py-3 !text-base"
-        icon={<Scan className="w-5 h-5" />}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
       >
-        Start Scan
-      </Button>
+        <Button
+          variant="mint"
+          onClick={onStartScan}
+          disabled={!isConnected && !walletAddress}
+          className="!px-8 !py-3 !text-base"
+          icon={<Scan className="w-5 h-5" />}
+        >
+          Start Scan
+        </Button>
+      </motion.div>
 
       {!isConnected && !walletAddress && (
-        <p className="text-gray-500 text-xs">Connect your wallet first</p>
+        <motion.p 
+          className="text-gray-500 text-xs"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          Connect your wallet first
+        </motion.p>
       )}
-    </div>
+
+      {/* Features List */}
+      <motion.div 
+        className="mt-4 grid grid-cols-2 gap-3 w-full max-w-xs"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+      >
+        {[
+          { icon: '🎯', text: 'Genesis Rank' },
+          { icon: '📊', text: 'TX Count' },
+          { icon: '🏆', text: 'Achievements' },
+          { icon: '🎴', text: 'Flex Card' },
+        ].map((feature, i) => (
+          <motion.div
+            key={feature.text}
+            className="flex items-center gap-2 text-xs text-gray-400"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6 + i * 0.1 }}
+          >
+            <span>{feature.icon}</span>
+            <span>{feature.text}</span>
+          </motion.div>
+        ))}
+      </motion.div>
+    </motion.div>
   );
 };
