@@ -49,7 +49,7 @@ export const ScanView: React.FC<ScanViewProps> = ({
       </div>
 
       {/* Connected Wallet */}
-      {isConnected && walletAddress && (
+      {(isConnected || walletAddress) && walletAddress && (
         <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
             <div className="w-2 h-2 rounded-full bg-green-500" />
@@ -72,14 +72,14 @@ export const ScanView: React.FC<ScanViewProps> = ({
       <Button
         variant="mint"
         onClick={onStartScan}
-        disabled={!isConnected}
+        disabled={!isConnected && !walletAddress}
         className="!px-8 !py-3 !text-base"
         icon={<Scan className="w-5 h-5" />}
       >
         Start Scan
       </Button>
 
-      {!isConnected && (
+      {!isConnected && !walletAddress && (
         <p className="text-gray-500 text-xs">Connect your wallet first</p>
       )}
     </div>

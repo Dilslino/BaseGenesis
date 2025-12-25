@@ -11,10 +11,14 @@ import { Leaderboard } from '../components/Leaderboard';
 import { LoadingSequence } from '../components/LoadingSequence';
 import { DonateModal } from '../components/DonateModal';
 import { ConnectWalletModal } from '../components/ConnectWalletModal';
+import { AddMiniAppModal } from '../components/AddMiniAppModal';
 import { Button } from '../components/Button';
 import { useFarcaster } from '../hooks/useFarcaster';
 import { useDonate } from '../hooks/useDonate';
 import { UserGenesisData, LeaderboardEntry } from '../types';
+import { getLeaderboard, getTotalUsers, getUserRankPosition } from '../services/supabase';
+import { saveScanFirebase } from '../services/firebaseCounter';
+import { MOCK_LEADERBOARD } from '../constants';
 
 export default function Home() {
   // Navigation
@@ -44,6 +48,10 @@ export default function Home() {
   
   // Connect wallet modal
   const [showConnectModal, setShowConnectModal] = useState(false);
+  
+  // Add Mini App modal
+  const [showAddMiniAppModal, setShowAddMiniAppModal] = useState(false);
+  const [isAddingMiniApp, setIsAddingMiniApp] = useState(false);
 
   // Farcaster MiniKit hook
   const { 
@@ -76,6 +84,17 @@ export default function Home() {
     }
   }, [isLoaded, isInFrame, farcasterWallet, isAuthenticated]);
 
+  // Show Add Mini App modal after loading (if not already added)
+  useEffect(() => {
+    if (isLoaded && isInFrame && !isAppAdded) {
+      // Show modal after a short delay for better UX
+      const timer = setTimeout(() => {
+        setShowAddMiniAppModal(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoaded, isInFrame, isAppAdded]);
+
   // Sync AppKit wallet state
   useEffect(() => {
     if (isAppKitConnected && appKitAddress) {
@@ -87,15 +106,29 @@ export default function Home() {
 
   // Fetch leaderboard on load
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInitialData = async () => {
       try {
-        // Fetch from API or use default
-        setTotalUsers(142000);
+        // Fetch leaderboard from Supabase
+        const leaderboard = await getLeaderboard(100);
+        if (leaderboard.length > 0) {
+          setLeaderboardData(leaderboard);
+        } else {
+          // Fallback to mock data if Supabase returns empty
+          console.log('Using mock leaderboard data as fallback');
+          setLeaderboardData(MOCK_LEADERBOARD);
+        }
+        
+        // Fetch total users count
+        const total = await getTotalUsers();
+        setTotalUsers(total > 0 ? total : 142000);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching initial data:', error);
+        // Fallback to mock data on error
+        setLeaderboardData(MOCK_LEADERBOARD);
+        setTotalUsers(142000);
       }
     };
-    fetchData();
+    fetchInitialData();
   }, []);
 
   // Open connect wallet modal
@@ -104,6 +137,21 @@ export default function Home() {
       handleConnectFarcaster();
     } else {
       setShowConnectModal(true);
+    }
+  };
+
+  // Handle Add Mini App
+  const handleAddMiniApp = async () => {
+    setIsAddingMiniApp(true);
+    try {
+      const success = await addMiniApp();
+      if (success) {
+        setShowAddMiniAppModal(false);
+      }
+    } catch (err) {
+      console.error('Add mini app error:', err);
+    } finally {
+      setIsAddingMiniApp(false);
     }
   };
 
@@ -152,7 +200,8 @@ export default function Home() {
 
   // Start scan (connected wallet)
   const handleStartScan = useCallback(async () => {
-    let addressToScan = walletAddress;
+    // Use walletAddress from state, or farcasterWallet as fallback
+    let addressToScan = walletAddress || farcasterWallet;
     
     if (!addressToScan) {
       setScanError('Please connect your wallet first');
@@ -181,6 +230,9 @@ export default function Home() {
         setLeaderboardData(data.leaderboard);
       }
       
+      // Increment Firebase scan counter
+      await saveScanFirebase(addressToScan);
+      
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
       setActiveTab('profile');
@@ -191,7 +243,7 @@ export default function Home() {
     } finally {
       setIsScanning(false);
     }
-  }, [walletAddress]);
+  }, [walletAddress, farcasterWallet]);
 
   // Paste address scan (not connected)
   const handlePasteAddressScan = useCallback(async (address: string) => {
@@ -217,6 +269,9 @@ export default function Home() {
       if (data.leaderboard) {
         setLeaderboardData(data.leaderboard);
       }
+      
+      // Increment Firebase scan counter
+      await saveScanFirebase(address);
       
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
@@ -435,6 +490,14 @@ export default function Home() {
         onConnectWalletConnect={handleConnectWalletConnect}
         isConnecting={isConnecting}
         isInFrame={isInFrame}
+      />
+
+      {/* Add Mini App Modal */}
+      <AddMiniAppModal
+        isOpen={showAddMiniAppModal}
+        onClose={() => setShowAddMiniAppModal(false)}
+        onAdd={handleAddMiniApp}
+        isAdding={isAddingMiniApp}
       />
     </div>
   );

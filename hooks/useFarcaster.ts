@@ -59,7 +59,19 @@ export const useFarcaster = (): UseFarcasterResult => {
               setAuthToken(token);
               setIsAuthenticated(true);
               console.log('✅ Auto-authenticated successfully!');
-              console.log('📝 Auth token:', token.substring(0, 20) + '...');
+              
+              // AUTO-CONNECT WALLET after successful auth
+              try {
+                console.log('🔗 Auto-connecting wallet...');
+                const provider = sdk.wallet.ethProvider;
+                const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                if (Array.isArray(accounts) && accounts.length > 0) {
+                  setWalletAddress(accounts[0]);
+                  console.log('✅ Auto-connected wallet:', accounts[0]);
+                }
+              } catch (walletErr) {
+                console.warn('⚠️ Auto wallet connect failed:', walletErr);
+              }
             }
           } catch (authError) {
             console.warn('⚠️ Auto-authentication failed:', authError);
@@ -75,6 +87,8 @@ export const useFarcaster = (): UseFarcasterResult => {
         // Signal ready to Farcaster
         await sdk.actions.ready();
         setIsLoaded(true);
+        
+        // Note: Auto-prompt disabled - using modal in page.tsx instead
       } catch (err) {
         console.log('Not in Farcaster frame or SDK error:', err);
         setIsLoaded(true);

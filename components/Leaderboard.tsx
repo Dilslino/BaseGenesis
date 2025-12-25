@@ -133,7 +133,16 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
 
       {/* List */}
       <div className="flex-grow overflow-y-auto space-y-2 pr-1 -mr-1">
-        {sortedEntries.map((entry, idx) => {
+        {sortedEntries.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+              <Trophy className="w-8 h-8 text-gray-500" />
+            </div>
+            <p className="text-gray-400 text-sm">No data yet</p>
+            <p className="text-gray-500 text-xs mt-1">Be the first to scan your wallet!</p>
+          </div>
+        ) : (
+          sortedEntries.map((entry, idx) => {
           const position = idx + 1;
           const badge = getBadgeConfig(position);
           const isCurrentUser = userAddress && entry.address.toLowerCase().includes(userAddress.slice(-4).toLowerCase());
@@ -203,7 +212,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
               </div>
             </div>
           );
-        })}
+        })
+        )}
       </div>
 
       {/* User's Rank (if not in top 10) */}
