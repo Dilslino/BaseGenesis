@@ -7,9 +7,7 @@ interface ScanViewProps {
   isConnected: boolean;
   isScanning: boolean;
   walletAddress: string | null;
-  isAuthenticated?: boolean;
   onStartScan: () => void;
-  userName?: string;
   error?: string;
 }
 
@@ -17,9 +15,7 @@ export const ScanView: React.FC<ScanViewProps> = ({
   isConnected, 
   isScanning, 
   walletAddress,
-  isAuthenticated,
   onStartScan,
-  userName,
   error 
 }) => {
   const shortAddress = walletAddress 
@@ -64,18 +60,6 @@ export const ScanView: React.FC<ScanViewProps> = ({
           </div>
         </div>
       )}
-      
-      {/* Authenticated but no wallet warning */}
-      {isConnected && isAuthenticated && !walletAddress && (
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl px-4 py-3 text-center">
-          <p className="text-blue-400 text-sm font-medium mb-1">
-            {userName ? `Hi @${userName}!` : 'Ready to Scan'}
-          </p>
-          <p className="text-yellow-400/80 text-xs">
-            Click "Start Scan" to analyze your Base history
-          </p>
-        </div>
-      )}
 
       {/* Error */}
       {error && (
@@ -88,15 +72,15 @@ export const ScanView: React.FC<ScanViewProps> = ({
       <Button
         variant="mint"
         onClick={onStartScan}
-        disabled={!isConnected && !isAuthenticated}
+        disabled={!isConnected}
         className="!px-8 !py-3 !text-base"
         icon={<Scan className="w-5 h-5" />}
       >
         Start Scan
       </Button>
 
-      {!isConnected && !isAuthenticated && (
-        <p className="text-gray-500 text-xs">Please connect to continue</p>
+      {!isConnected && (
+        <p className="text-gray-500 text-xs">Connect your wallet first</p>
       )}
     </div>
   );

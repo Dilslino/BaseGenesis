@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Wallet, LogOut, Users, Search } from 'lucide-react';
 import { Button } from './Button';
 import { useRealtimeScanCount } from '../hooks/useRealtimeScanCount';
@@ -19,48 +19,68 @@ interface HomeViewProps {
 
 const AnimatedCounter: React.FC<{ value: number }> = ({ value }) => {
   const [displayValue, setDisplayValue] = useState<number | null>(null);
-  const [hasInitialized, setHasInitialized] = useState(false);
-  
+  const hasInitializedRef = useRef(false);
+  const prevValueRef = useRef<number>(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   useEffect(() => {
+    // Cleanup any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
     if (value <= 0) return;
-    
+
     // First time: just set the value directly (no animation from 0)
-    if (!hasInitialized) {
+    if (!hasInitializedRef.current) {
       setDisplayValue(value);
-      setHasInitialized(true);
+      prevValueRef.current = value;
+      hasInitializedRef.current = true;
       return;
     }
-    
+
     // Subsequent updates: animate only the increment (+1, +2, etc)
-    const prevValue = displayValue || value;
+    const prevValue = prevValueRef.current;
     if (value > prevValue) {
       // Small animation for increment
       const diff = value - prevValue;
       const steps = Math.min(diff * 10, 30);
       const increment = diff / steps;
       let current = prevValue;
-      
-      const timer = setInterval(() => {
+
+      timerRef.current = setInterval(() => {
         current += increment;
         if (current >= value) {
           setDisplayValue(value);
-          clearInterval(timer);
+          prevValueRef.current = value;
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
         } else {
           setDisplayValue(Math.floor(current));
         }
       }, 50);
-      
-      return () => clearInterval(timer);
     } else {
       setDisplayValue(value);
+      prevValueRef.current = value;
     }
-  }, [value, hasInitialized]);
-  
+
+    // Cleanup on unmount or value change
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [value]);
+
   // Show nothing until we have a value
   if (displayValue === null) {
     return <span>...</span>;
   }
-  
+
   return <span>{displayValue.toLocaleString()}</span>;
 };
 
@@ -85,17 +105,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [pasteError, setPasteError] = useState('');
   
   // Use real-time scan count from Supabase
-  const { count: scanCount, isLoading } = useRealtimeScanCount(totalUsers);
+  const { count: scanCount } = useRealtimeScanCount(totalUsers);
 
   const handlePasteScan = () => {
     setPasteError('');
     const trimmed = pasteAddress.trim();
-    
-    // Null/empty check
-    if (!trimmed) {
-      setPasteError('Please enter a wallet address');
-      return;
-    }
     
     if (!trimmed) {
       setPasteError('Please enter an address');
@@ -274,17 +288,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <AnimatedCounter value={scanCount} />
             </div>
           </div>
-          <div className="flex items-center justify-center gap-1.5 mt-1.5 sm:mt-2">
-            {!isLoading && (
-              <>
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                <p className="text-center text-gray-400 text-[9px] sm:text-[10px]">Live updates enabled</p>
-              </>
-            )}
-            {isLoading && (
-              <p className="text-center text-gray-500 text-[9px] sm:text-[10px]">Connecting...</p>
-            )}
-          </div>
+          <p className="text-center text-gray-400 text-[9px] sm:text-[10px] mt-1.5 sm:mt-2">Live counter updating in real-time</p>
         </div>
       </div>
     </div>

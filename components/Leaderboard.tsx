@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Trophy, Crown, Star, Medal, Award, Gem, TrendingUp } from 'lucide-react';
+import { Trophy, Crown, Star, Medal, Award, Gem, Flame, Zap, Shield } from 'lucide-react';
 import { LeaderboardEntry, UserRank } from '../types';
 import { RANK_BADGE_COLORS, RANK_EMOJI, RANK_COLORS } from '../constants';
 
@@ -14,50 +14,88 @@ const getBadgeConfig = (position: number) => {
   // Top 1 - Diamond Champion
   if (position === 1) {
     return {
-      bg: 'bg-gradient-to-br from-yellow-500/20 via-amber-600/20 to-yellow-500/20',
-      border: 'border-yellow-400/40',
-      glow: 'shadow-[0_0_20px_rgba(234,179,8,0.5)]',
+      icon: <Crown className="w-5 h-5 text-yellow-300" />,
+      bg: 'bg-gradient-to-br from-yellow-500/30 via-amber-500/20 to-orange-500/30',
+      border: 'border-yellow-500/50',
+      glow: 'shadow-[0_0_15px_rgba(234,179,8,0.4)]',
       label: '👑',
-      textColor: 'text-yellow-300'
+      title: 'Champion'
     };
   }
   // Top 2 - Platinum
   if (position === 2) {
     return {
-      bg: 'bg-gradient-to-br from-slate-400/15 via-gray-300/15 to-slate-400/15',
-      border: 'border-slate-300/40',
-      glow: 'shadow-[0_0_15px_rgba(148,163,184,0.4)]',
+      icon: <Gem className="w-4 h-4 text-slate-200" />,
+      bg: 'bg-gradient-to-br from-slate-400/20 via-gray-300/20 to-slate-500/20',
+      border: 'border-slate-400/50',
+      glow: 'shadow-[0_0_10px_rgba(148,163,184,0.3)]',
       label: '💎',
-      textColor: 'text-slate-200'
+      title: 'Platinum'
     };
   }
   // Top 3 - Gold
   if (position === 3) {
     return {
-      bg: 'bg-gradient-to-br from-orange-500/15 via-amber-600/15 to-orange-500/15',
-      border: 'border-orange-400/40',
-      glow: 'shadow-[0_0_12px_rgba(217,119,6,0.4)]',
-      label: '🥇',
-      textColor: 'text-orange-300'
+      icon: <Medal className="w-4 h-4 text-amber-500" />,
+      bg: 'bg-gradient-to-br from-amber-600/20 via-orange-500/20 to-amber-700/20',
+      border: 'border-amber-600/50',
+      glow: 'shadow-[0_0_8px_rgba(217,119,6,0.3)]',
+      label: '🥉',
+      title: 'Gold'
     };
   }
-  // Top 4-10 - Elite
+  // Top 4-5 - Silver Elite
+  if (position <= 5) {
+    return {
+      icon: <Award className="w-4 h-4 text-gray-400" />,
+      bg: 'bg-gray-500/10',
+      border: 'border-gray-500/30',
+      glow: '',
+      label: '🥈',
+      title: 'Silver'
+    };
+  }
+  // Top 6-10 - Bronze
   if (position <= 10) {
     return {
+      icon: <Flame className="w-4 h-4 text-orange-400" />,
+      bg: 'bg-orange-500/10',
+      border: 'border-orange-500/20',
+      glow: '',
+      label: '🔥',
+      title: 'Bronze'
+    };
+  }
+  // Top 11-25 - Rising Star
+  if (position <= 25) {
+    return {
+      icon: <Zap className="w-3.5 h-3.5 text-cyan-400" />,
+      bg: 'bg-cyan-500/10',
+      border: 'border-cyan-500/20',
+      glow: '',
+      label: '⚡',
+      title: 'Rising'
+    };
+  }
+  // Top 26-50 - Verified
+  if (position <= 50) {
+    return {
+      icon: <Shield className="w-3.5 h-3.5 text-blue-400" />,
       bg: 'bg-blue-500/10',
       border: 'border-blue-500/20',
       glow: '',
-      label: '⭐',
-      textColor: 'text-blue-300'
+      label: '🛡️',
+      title: 'Verified'
     };
   }
   // Rest - Standard
   return {
+    icon: <span className="text-xs font-bold text-gray-500">#{position}</span>,
     bg: 'bg-white/5',
-    border: 'border-white/10',
+    border: 'border-white/5',
     glow: '',
     label: '',
-    textColor: 'text-gray-400'
+    title: ''
   };
 };
 
@@ -72,28 +110,25 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
       [UserRank.UNKNOWN]: 0,
     };
     
-    return [...entries]
-      .sort((a, b) => {
+    return [...entries].sort((a, b) => {
       // First by days
       if (b.days !== a.days) return b.days - a.days;
       // Then by rank weight
       return rankWeight[b.status] - rankWeight[a.status];
-    })
-      .slice(0, 100); // Limit to top 100
+    });
   }, [entries]);
 
   return (
     <div className="flex flex-col h-full animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mb-4">
         <Trophy className="w-5 h-5 text-yellow-500" />
-          <h2 className="text-lg font-bold">Top 100 Leaderboard</h2>
-        </div>
-        <div className="flex items-center gap-1 px-2 py-1 bg-white/5 rounded-lg">
-          <TrendingUp className="w-3.5 h-3.5 text-green-400" />
-          <span className="text-xs text-gray-400">{sortedEntries.length}</span>
-        </div>
+        <h2 className="text-lg font-bold">Leaderboard</h2>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center gap-4 mb-3 text-[10px] text-gray-500">
+        <span>Sorted by: Days on Base + Rank</span>
       </div>
 
       {/* List */}
@@ -107,36 +142,28 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
             <div 
               key={`${entry.address}-${idx}`}
               className={`
-                relative p-3.5 rounded-xl transition-all duration-200
-                ${badge.bg} hover:bg-white/10
-                border ${badge.border}
+                relative p-3 rounded-2xl transition-all duration-300
+                glass-card hover:bg-white/12
                 ${badge.glow}
                 ${isCurrentUser ? 'ring-2 ring-base-blue shadow-[0_0_20px_rgba(0,82,255,0.3)]' : ''}
               `}
             >
-              <div className="flex items-center gap-3.5">
-                {/* Rank Number with Badge */}
-                <div className="flex items-center gap-2">
-                  {/* Position Number */}
-                  <div className={`
-                    min-w-[44px] h-11 rounded-lg flex items-center justify-center
-                    ${position <= 3 ? 'bg-black/30' : 'bg-black/20'}
-                    border ${position <= 3 ? 'border-white/20' : 'border-white/10'}
-                  `}>
-                    <div className="flex flex-col items-center">
-                      <span className={`text-xs font-black ${badge.textColor}`}>
-                        #{position}
-                      </span>
-                      {badge.label && (
-                        <span className="text-sm leading-none mt-0.5">{badge.label}</span>
-                      )}
-                    </div>
-                  </div>
+              <div className="flex items-center gap-3">
+                {/* Rank Position Badge */}
+                <div className={`
+                  w-10 h-10 rounded-xl flex flex-col items-center justify-center
+                  ${position <= 3 ? 'bg-black/20' : 'bg-white/5'}
+                `}>
+                  {badge.icon}
+                  {position <= 10 && badge.title && (
+                    <span className="text-[7px] text-gray-400 mt-0.5">{badge.title}</span>
+                  )}
                 </div>
 
                 {/* Profile */}
                 <div className="flex-grow min-w-0">
                   <div className="flex items-center gap-1.5">
+                    {position <= 5 && <span className="text-sm">{badge.label}</span>}
                     <span className="font-semibold text-sm truncate">
                       {entry.name}
                       {isCurrentUser && <span className="text-base-blue ml-1">(You)</span>}
@@ -145,6 +172,11 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
                   </div>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-[10px] text-gray-500 font-mono">{entry.address}</span>
+                    {position <= 3 && (
+                      <span className="text-[8px] px-1.5 py-0.5 bg-white/10 rounded text-gray-400">
+                        TOP {position}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -152,24 +184,21 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
                 <div className="flex flex-col items-end gap-1">
                   {/* Mini Genesis Card */}
                   <div className={`
-                    relative w-11 h-[52px] rounded-lg overflow-hidden
+                    relative w-10 h-14 rounded-md overflow-hidden
                     bg-gradient-to-br ${RANK_COLORS[entry.status]}
                     border border-white/20 shadow-lg
                   `}>
                     {/* Card inner content */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30">
-                      <span className="text-xl">{RANK_EMOJI[entry.status]}</span>
-                      <span className="text-[7px] font-bold text-white/90 mt-1 text-center leading-tight px-0.5">
+                      <span className="text-lg">{RANK_EMOJI[entry.status]}</span>
+                      <span className="text-[6px] font-bold text-white/90 mt-0.5 text-center leading-tight px-0.5">
                         {entry.status.split(' ')[0]}
                       </span>
                     </div>
                     {/* Shine effect */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent" />
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs font-bold text-white">{entry.days}</span>
-                    <span className="text-[9px] text-gray-500">days</span>
-                  </div>
+                  <span className="text-[10px] text-gray-400 font-mono">{entry.days}d</span>
                 </div>
               </div>
             </div>
@@ -177,20 +206,12 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries, userRank, use
         })}
       </div>
 
-      {/* User's Rank (if not in top 100) */}
-      {userRank && userRank > 100 && (
-        <div className="mt-3 p-4 bg-gradient-to-br from-base-blue/10 to-purple-500/10 rounded-xl border border-base-blue/30 shadow-[0_0_20px_rgba(0,82,255,0.25)]">
+      {/* User's Rank (if not in top 10) */}
+      {userRank && userRank > 10 && (
+        <div className="mt-3 p-3 glass-card rounded-2xl border-base-blue/30 shadow-[0_0_15px_rgba(0,82,255,0.2)]">
           <div className="flex items-center justify-between">
-            <div className="flex flex-col">
-              <span className="text-xs text-gray-400">Your Global Rank</span>
-              <span className="text-[10px] text-gray-500 mt-0.5">Keep climbing!</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-base-blue" />
-              <span className="font-black text-base-blue text-2xl drop-shadow-[0_0_10px_rgba(0,82,255,0.6)]">
-                #{userRank.toLocaleString()}
-              </span>
-            </div>
+            <span className="text-sm text-gray-300">Your Global Rank</span>
+            <span className="font-bold text-base-blue text-lg drop-shadow-[0_0_8px_rgba(0,82,255,0.5)]">#{userRank.toLocaleString()}</span>
           </div>
         </div>
       )}
