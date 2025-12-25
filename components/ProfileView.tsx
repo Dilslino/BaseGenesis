@@ -124,16 +124,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ userData, onShareFarca
         </Button>
       </div>
 
-      {/* Donate Button */}
+      {/* Support Creator - Subtle Link Style */}
       {onDonate && (
-        <Button 
-          variant="primary" 
+        <button 
           onClick={onDonate}
-          className="!text-xs !py-2.5 w-full mt-2 !bg-gradient-to-r !from-pink-500 !via-purple-500 !to-indigo-500" 
-          icon={<Heart className="w-4 h-4" />}
+          className="group flex items-center justify-center gap-2 py-3 text-gray-500 hover:text-white transition-all duration-300"
         >
-          Support the Creator
-        </Button>
+          <Heart className="w-3.5 h-3.5 group-hover:text-pink-400 group-hover:fill-pink-400 transition-colors" />
+          <span className="text-xs">Buy me a coffee</span>
+        </button>
       )}
 
       {/* Share Modal */}
