@@ -1,8 +1,16 @@
 /** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Externalize server-only deps to prevent Turbopack from bundling test files
-  serverExternalPackages: ['thread-stream', 'pino', 'pino-pretty', 'pino-abstract-transport'],
+  serverExternalPackages: [
+    'thread-stream',
+    'pino',
+    'pino-pretty',
+    'pino-abstract-transport',
+    '@coinbase/cdp-sdk',
+    '@supabase/supabase-js',
+    'undici',
+  ],
   images: {
     domains: ['basegenesis.vercel.app'],
   },
@@ -13,6 +21,19 @@ const nextConfig = {
         destination: '/api/image',
       },
     ]
+  },
+  webpack: (config, { isServer }) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      '@solana/kit': false,
+      '@solana-program/system': false,
+      '@base-org/account': false,
+      '@gemini-wallet/core': false,
+      '@metamask/sdk': false,
+      'porto': false,
+      '@walletconnect/ethereum-provider': false,
+    };
+    return config;
   },
 }
 

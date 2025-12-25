@@ -61,7 +61,7 @@ export const useDonate = (): UseDonateResult => {
     setError(null);
 
     try {
-      const provider = (isInFrame && sdk.wallet) ? sdk.wallet.ethProvider : window.ethereum;
+      const provider = (isInFrame && sdk.wallet) ? (sdk.wallet.ethProvider as any) : window.ethereum;
       
       if (!provider) {
         throw new Error('No wallet provider available');

@@ -106,7 +106,7 @@ export const useFarcaster = (): UseFarcasterResult => {
           return accounts[0];
         }
       } else if (window.ethereum) {
-        const result = await window.ethereum.request({ 
+        const result = await (window.ethereum as any).request({ 
           method: 'eth_requestAccounts' 
         });
         
@@ -223,11 +223,3 @@ export const useFarcaster = (): UseFarcasterResult => {
   };
 };
 
-// Add ethereum type to window
-declare global {
-  interface Window {
-    ethereum?: {
-      request: (args: { method: string; params?: any[] }) => Promise<unknown>;
-    };
-  }
-}
