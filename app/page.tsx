@@ -436,6 +436,7 @@ export default function Home() {
               userData={userData}
               onShareFarcaster={handleShare}
               onViewBasescan={handleViewBasescan}
+              onDonate={() => setShowDonateModal(true)}
             />
           </div>
         )}

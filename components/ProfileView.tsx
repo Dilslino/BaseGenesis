@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Award, Layers, Activity, ExternalLink, Share2, X } from 'lucide-react';
+import { Calendar, Award, Layers, Activity, ExternalLink, Share2, X, Heart } from 'lucide-react';
 import { UserGenesisData } from '../types';
 import { RANK_COLORS, RANK_EMOJI, RANK_BADGE_COLORS, RANK_DESCRIPTIONS } from '../constants';
 import { Achievements } from './Achievements';
@@ -9,9 +9,10 @@ interface ProfileViewProps {
   userData: UserGenesisData;
   onShareFarcaster: (text: string, url: string) => void;
   onViewBasescan: () => void;
+  onDonate?: () => void;
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ userData, onShareFarcaster, onViewBasescan }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ userData, onShareFarcaster, onViewBasescan, onDonate }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const gradientColor = RANK_COLORS[userData.rank];
   const shortAddress = `${userData.address.slice(0, 6)}...${userData.address.slice(-4)}`;
@@ -122,6 +123,18 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ userData, onShareFarca
           View on Chain
         </Button>
       </div>
+
+      {/* Donate Button */}
+      {onDonate && (
+        <Button 
+          variant="primary" 
+          onClick={onDonate}
+          className="!text-xs !py-2.5 w-full mt-2 !bg-gradient-to-r !from-pink-500 !via-purple-500 !to-indigo-500" 
+          icon={<Heart className="w-4 h-4" />}
+        >
+          Support the Creator
+        </Button>
+      )}
 
       {/* Share Modal */}
       {showShareModal && (
