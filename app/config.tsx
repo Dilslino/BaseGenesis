@@ -3,7 +3,11 @@ import { cookieStorage, createStorage } from '@wagmi/core'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { base } from '@reown/appkit/networks'
 
-export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '3a817781d83d47c06788229b4e4325e6'
+export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ''
+
+if (!projectId) {
+  console.warn('Missing NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID environment variable')
+}
 
 export const networks = [base]
 

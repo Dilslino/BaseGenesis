@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserRank } from '../types';
-import { RANK_COLORS, RANK_EMOJI, RANK_BADGE_COLORS } from '../constants';
+import { RANK_EMOJI, RANK_BADGE_COLORS } from '../constants';
 
 interface RankBadgeProps {
   rank: UserRank;

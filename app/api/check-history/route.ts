@@ -92,11 +92,13 @@ export async function POST(request: Request) {
         // A. Simpan/Update data user ke database
         const { error: upsertError } = await supabase
             .from('users')
-            .upsert({
+.upsert({
                 address: address,
                 rank: rank,
                 days_since_joined: daysSinceJoined,
-                first_tx_date: txDate.toISOString()
+                first_tx_date: txDate.toISOString(),
+                first_tx_hash: firstTx.hash,
+                block_number: parseInt(firstTx.blockNumber, 10)
             }, { onConflict: 'address' });
 
         if (upsertError) {
