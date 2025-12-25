@@ -13,11 +13,20 @@ export const saveScanFirebase = async (walletAddress: string): Promise<boolean> 
   try {
     const countRef = ref(database, SCAN_COUNT_PATH);
     
-    await runTransaction(countRef, (currentCount) => {
+    const result = await runTransaction(countRef, (currentCount) => {
+      // Increment count, initializing to 0 if null
       return (currentCount || 0) + 1;
     });
 
-    return true;
+    if (result.committed) {
+      // Optional: Log individual scan if needed in a separate path
+      // const scanLogRef = ref(database, `scans/${Date.now()}`);
+      // set(scanLogRef, { address: walletAddress, timestamp: Date.now() });
+      return true;
+    } else {
+      console.warn('Firebase transaction not committed');
+      return false;
+    }
   } catch (err) {
     console.error('Firebase save scan error:', err);
     return false;
@@ -33,7 +42,10 @@ export const getTotalScansFirebase = async (): Promise<number> => {
   try {
     const countRef = ref(database, SCAN_COUNT_PATH);
     const snapshot = await get(countRef);
-    return snapshot.val() || 0;
+    if (snapshot.exists()) {
+      return snapshot.val();
+    }
+    return 0;
   } catch (err) {
     console.error('Firebase get total scans error:', err);
     return 0;
@@ -51,8 +63,12 @@ export const subscribeToScanCountFirebase = (
   const countRef = ref(database, SCAN_COUNT_PATH);
   
   const unsubscribe = onValue(countRef, (snapshot) => {
-    const count = snapshot.val() || 0;
-    onUpdate(count);
+    const count = snapshot.val();
+    if (typeof count === 'number') {
+      onUpdate(count);
+    }
+  }, (error) => {
+    console.error('Firebase subscription error:', error);
   });
 
   return unsubscribe;

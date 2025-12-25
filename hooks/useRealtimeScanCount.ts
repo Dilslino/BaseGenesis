@@ -5,6 +5,7 @@ import { getTotalUsers, subscribeToScanCount } from '../services/supabase';
 interface UseRealtimeScanCountResult {
   count: number;
   isLoading: boolean;
+  source: 'firebase' | 'supabase' | 'none';
 }
 
 /**
@@ -19,82 +20,91 @@ interface UseRealtimeScanCountResult {
 export const useRealtimeScanCount = (initialCount?: number): UseRealtimeScanCountResult => {
   const [count, setCount] = useState<number>(initialCount || 0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [useFirebase, setUseFirebase] = useState<boolean>(true);
+  const [source, setSource] = useState<'firebase' | 'supabase' | 'none'>('none');
 
   useEffect(() => {
     let firebaseUnsubscribe: (() => void) | null = null;
     let supabaseUnsubscribe: (() => void) | null = null;
+    let isMounted = true;
     
-    // Try Firebase first
-    getTotalScansFirebase().then(async (firebaseCount) => {
-      if (firebaseCount > 0) {
-        // Firebase is working, use it
-        console.log('✅ Using Firebase for real-time counter');
-        setCount(firebaseCount);
-        setUseFirebase(true);
-        setIsLoading(false);
+    const initCounter = async () => {
+      try {
+        // 1. Try Firebase first
+        const firebaseCount = await getTotalScansFirebase();
         
-        // Subscribe to Firebase real-time updates
-        firebaseUnsubscribe = subscribeToScanCountFirebase((newCount) => {
-          console.log('🔥 Firebase real-time update:', newCount);
-          if (newCount > 0) {
-            setCount(newCount);
-          }
-        });
-      } else {
-        // Firebase not available, use Supabase
-        console.log('⚠️ Firebase unavailable, using Supabase for counter');
-        setUseFirebase(false);
-        
-        // Get initial count from Supabase
-        const supabaseCount = await getTotalUsers();
-        setCount(supabaseCount > 0 ? supabaseCount : (initialCount || 0));
-        setIsLoading(false);
-        
-        // Subscribe to Supabase real-time updates (if available)
-        try {
-          supabaseUnsubscribe = subscribeToScanCount((newCount) => {
-            console.log('📊 Supabase real-time update:', newCount);
-            if (newCount > 0) {
+        if (firebaseCount > 0 && isMounted) {
+          // Firebase is working, use it
+          console.log('✅ Using Firebase for real-time counter');
+          setCount(firebaseCount);
+          setSource('firebase');
+          setIsLoading(false);
+          
+          // Subscribe to Firebase real-time updates
+          firebaseUnsubscribe = subscribeToScanCountFirebase((newCount) => {
+            if (isMounted && newCount > 0) {
               setCount(newCount);
             }
           });
-        } catch (err) {
-          console.warn('Supabase realtime subscription failed:', err);
+          return;
+        } 
+        
+        // 2. Firebase not available/empty, try Supabase
+        if (isMounted) {
+          console.log('⚠️ Firebase unavailable/empty, checking Supabase');
           
-          // Fallback: Poll every 10 seconds if realtime fails
-          const pollInterval = setInterval(async () => {
-            try {
-              const newCount = await getTotalUsers();
-              if (newCount > count) {
-                console.log('📊 Polling update:', newCount);
+          // Get initial count from Supabase
+          const supabaseCount = await getTotalUsers();
+          
+          if (supabaseCount > 0) {
+            setCount(supabaseCount);
+            setSource('supabase');
+          } else {
+            setCount(initialCount || 0);
+          }
+          setIsLoading(false);
+          
+          // Subscribe to Supabase real-time updates
+          try {
+            supabaseUnsubscribe = subscribeToScanCount((newCount) => {
+              if (isMounted && newCount > 0) {
                 setCount(newCount);
               }
-            } catch (error) {
-              console.error('Polling failed:', error);
-            }
-          }, 10000);
-          
-          // Store interval ID for cleanup
-          supabaseUnsubscribe = () => clearInterval(pollInterval);
+            });
+          } catch (err) {
+            console.warn('Supabase realtime subscription failed, using polling fallback');
+            // Fallback: Poll every 15 seconds
+            const pollInterval = setInterval(async () => {
+              if (!isMounted) return;
+              try {
+                const newCount = await getTotalUsers();
+                if (newCount > count) {
+                  setCount(newCount);
+                }
+              } catch (e) {
+                // ignore
+              }
+            }, 15000);
+            supabaseUnsubscribe = () => clearInterval(pollInterval);
+          }
+        }
+      } catch (err) {
+        console.error('Counter initialization error:', err);
+        if (isMounted) {
+          setCount(initialCount || 0);
+          setIsLoading(false);
         }
       }
-    }).catch(() => {
-      console.warn('Failed to fetch scan count, using initial value');
-      setCount(initialCount || 0);
-      setIsLoading(false);
-    });
+    };
+
+    initCounter();
 
     // Cleanup subscriptions on unmount
     return () => {
-      if (firebaseUnsubscribe) {
-        firebaseUnsubscribe();
-      }
-      if (supabaseUnsubscribe) {
-        supabaseUnsubscribe();
-      }
+      isMounted = false;
+      if (firebaseUnsubscribe) firebaseUnsubscribe();
+      if (supabaseUnsubscribe) supabaseUnsubscribe();
     };
   }, [initialCount]);
 
-  return { count, isLoading };
+  return { count, isLoading, source };
 };
