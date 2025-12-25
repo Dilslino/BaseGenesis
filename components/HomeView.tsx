@@ -25,7 +25,7 @@ interface HomeViewProps {
 }
 
 const AnimatedCounter: React.FC<{ value: number }> = ({ value }) => {
-  const [displayValue, setDisplayValue] = useState<number | null>(null);
+  const [displayValue, setDisplayValue] = useState<number>(0);
   const hasInitializedRef = useRef(false);
   const prevValueRef = useRef<number>(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -35,8 +35,6 @@ const AnimatedCounter: React.FC<{ value: number }> = ({ value }) => {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
-
-    if (value <= 0) return;
 
     if (!hasInitializedRef.current) {
       setDisplayValue(value);
@@ -77,10 +75,6 @@ const AnimatedCounter: React.FC<{ value: number }> = ({ value }) => {
       }
     };
   }, [value]);
-
-  if (displayValue === null) {
-    return <span>...</span>;
-  }
 
   return <span>{displayValue.toLocaleString()}</span>;
 };
