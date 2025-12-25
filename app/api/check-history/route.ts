@@ -1,6 +1,5 @@
 
 import { NextResponse } from 'next/server';
-import { MOCK_LEADERBOARD } from '../../../constants';
 import { UserRank, LeaderboardEntry } from '../../../types';
 import { supabase } from '../../lib/supabase';
 import { calculateRank, calculateDaysSinceJoined, parseTimestamp } from '../../../lib/rankUtils';
@@ -124,25 +123,7 @@ export async function POST(request: Request) {
         }
     }
 
-    // Jika DB kosong atau gagal, gunakan Mock data dicampur user saat ini
-    if (realLeaderboard.length === 0) {
-        realLeaderboard = [...MOCK_LEADERBOARD];
-        // Tambahkan user saat ini jika belum ada
-        if (!realLeaderboard.find(u => u.address === address)) {
-             realLeaderboard.push({
-                rank: 0, 
-                name: "You",
-                address: address,
-                status: rank,
-                days: daysSinceJoined,
-                isLegend: false
-            });
-        }
-        // Sort manual
-        realLeaderboard.sort((a, b) => b.days - a.days);
-        realLeaderboard = realLeaderboard.map((item, idx) => ({ ...item, rank: idx + 1 }));
-    }
-
+    // Return leaderboard (empty array if no data from Supabase)
     return NextResponse.json({
       userData,
       leaderboard: realLeaderboard

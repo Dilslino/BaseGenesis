@@ -16,9 +16,8 @@ import { Button } from '../components/Button';
 import { useFarcaster } from '../hooks/useFarcaster';
 import { useDonate } from '../hooks/useDonate';
 import { UserGenesisData, LeaderboardEntry } from '../types';
-import { getLeaderboard, getTotalUsers, getUserRankPosition } from '../services/supabase';
+import { getLeaderboard, getTotalUsers } from '../services/supabase';
 import { saveScanFirebase } from '../services/firebaseCounter';
-import { MOCK_LEADERBOARD } from '../constants';
 
 export default function Home() {
   // Navigation
@@ -110,22 +109,13 @@ export default function Home() {
       try {
         // Fetch leaderboard from Supabase
         const leaderboard = await getLeaderboard(100);
-        if (leaderboard.length > 0) {
-          setLeaderboardData(leaderboard);
-        } else {
-          // Fallback to mock data if Supabase returns empty
-          console.log('Using mock leaderboard data as fallback');
-          setLeaderboardData(MOCK_LEADERBOARD);
-        }
+        setLeaderboardData(leaderboard);
         
         // Fetch total users count
         const total = await getTotalUsers();
-        setTotalUsers(total > 0 ? total : 142000);
+        setTotalUsers(total);
       } catch (error) {
         console.error('Error fetching initial data:', error);
-        // Fallback to mock data on error
-        setLeaderboardData(MOCK_LEADERBOARD);
-        setTotalUsers(142000);
       }
     };
     fetchInitialData();
