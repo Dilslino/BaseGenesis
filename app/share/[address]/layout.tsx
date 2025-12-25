@@ -7,14 +7,32 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { address } = await params
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
+  
   // Dynamic card image via Next.js API route
   const cardImageUrl = `https://basegenesis.vercel.app/api/card/${address}`
   const shareUrl = `https://basegenesis.vercel.app/share/${address}`
   const appUrl = `https://basegenesis.vercel.app`
+  const splashImageUrl = `https://basegenesis.vercel.app/logo.jpg`
 
-  // Farcaster Frame embed format
-  const fcFrame = JSON.stringify({
-    version: "next",
+  // Farcaster MiniApp Embed format - version must be "1"
+  const miniAppEmbed = {
+    version: "1",
+    imageUrl: cardImageUrl,
+    button: {
+      title: "Check Your Genesis Rank",
+      action: {
+        type: "launch_miniapp",
+        name: "BaseGenesis",
+        url: appUrl,
+        splashImageUrl: splashImageUrl,
+        splashBackgroundColor: "#0f0c29"
+      }
+    }
+  }
+
+  // For backward compatibility with older clients
+  const frameEmbed = {
+    version: "1",
     imageUrl: cardImageUrl,
     button: {
       title: "Check Your Genesis Rank",
@@ -22,11 +40,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         type: "launch_frame",
         name: "BaseGenesis",
         url: appUrl,
-        splashImageUrl: "https://basegenesis.vercel.app/logo.jpg",
+        splashImageUrl: splashImageUrl,
         splashBackgroundColor: "#0f0c29"
       }
     }
-  })
+  }
 
   return {
     title: `${shortAddress} | BaseGenesis`,
@@ -53,13 +71,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: [cardImageUrl],
     },
     other: {
-      // Farcaster Frame metadata
-      'fc:frame': fcFrame,
-      'fc:frame:image': cardImageUrl,
-      'fc:frame:image:aspect_ratio': '1.91:1',
-      'fc:frame:button:1': 'Check Your Genesis Rank',
-      'fc:frame:button:1:action': 'link',
-      'fc:frame:button:1:target': appUrl,
+      // Farcaster MiniApp metadata (primary)
+      'fc:miniapp': JSON.stringify(miniAppEmbed),
+      // Farcaster Frame metadata (backward compatibility)
+      'fc:frame': JSON.stringify(frameEmbed),
     },
   }
 }

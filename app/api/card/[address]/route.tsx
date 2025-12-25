@@ -315,7 +315,7 @@ export async function GET(
       width: 1200,
       height: 800,
       headers: {
-        'Cache-Control': 'public, immutable, no-transform, max-age=3600',
+        'Cache-Control': 'public, immutable, no-transform, max-age=300',
         'Content-Type': 'image/png',
       },
     }
