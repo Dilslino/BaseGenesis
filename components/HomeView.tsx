@@ -406,11 +406,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
                   >
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-1 rounded-full overflow-hidden border-2 border-white/10 shadow-lg relative group-hover:border-white/30 transition-colors">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-1 rounded-full overflow-hidden border-2 border-white/10 shadow-lg relative group-hover:border-white/30 transition-colors bg-black/40">
                       <img 
                         src={rank.img} 
                         alt={rank.name} 
-                        className="w-full h-full object-cover scale-[1.6]" 
+                        className="w-full h-full object-cover scale-110" 
                       />
                     </div>
                     <p className={`text-${rank.color}-400 text-[10px] sm:text-[11px] font-bold mt-1`}>{rank.name}</p>
