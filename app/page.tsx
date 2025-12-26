@@ -403,6 +403,7 @@ export default function Home() {
                 onNavigateToScan={() => setActiveTab('scan')}
                 onNavigateToProfile={() => setActiveTab('profile')}
                 onPasteAddressScan={handlePasteAddressScan}
+                onDonate={() => setShowDonateModal(true)}
               />
             </motion.div>
           )}
