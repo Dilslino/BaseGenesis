@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wallet, LogOut, Users, Search, ChevronRight, Award, Calendar, Activity, Sparkles } from 'lucide-react';
+import { Wallet, LogOut, Search, ChevronRight, Award, Calendar, Activity, Sparkles, Heart } from 'lucide-react';
 import { Button } from './Button';
-import { useRealtimeScanCount } from '../hooks/useRealtimeScanCount';
 import { UserGenesisData } from '../types';
 import { RANK_EMOJI, RANK_BADGE_COLORS, RANK_COLORS } from '../constants';
 
@@ -22,62 +21,8 @@ interface HomeViewProps {
   onNavigateToScan: () => void;
   onNavigateToProfile: () => void;
   onPasteAddressScan: (address: string) => void;
+  onDonate?: () => void;
 }
-
-const AnimatedCounter: React.FC<{ value: number }> = ({ value }) => {
-  const [displayValue, setDisplayValue] = useState<number>(0);
-  const hasInitializedRef = useRef(false);
-  const prevValueRef = useRef<number>(0);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-
-    if (!hasInitializedRef.current) {
-      setDisplayValue(value);
-      prevValueRef.current = value;
-      hasInitializedRef.current = true;
-      return;
-    }
-
-    const prevValue = prevValueRef.current;
-    if (value > prevValue) {
-      const diff = value - prevValue;
-      const steps = Math.min(diff * 10, 30);
-      const increment = diff / steps;
-      let current = prevValue;
-
-      timerRef.current = setInterval(() => {
-        current += increment;
-        if (current >= value) {
-          setDisplayValue(value);
-          prevValueRef.current = value;
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-          }
-        } else {
-          setDisplayValue(Math.floor(current));
-        }
-      }, 50);
-    } else {
-      setDisplayValue(value);
-      prevValueRef.current = value;
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, [value]);
-
-  return <span>{displayValue.toLocaleString()}</span>;
-};
 
 // Mini Card Preview Component
 const MiniCardPreview: React.FC<{ 
@@ -196,6 +141,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onNavigateToScan,
   onNavigateToProfile,
   onPasteAddressScan,
+  onDonate,
 }) => {
   const shortAddress = walletAddress 
     ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` 
@@ -204,8 +150,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [pasteAddress, setPasteAddress] = useState('');
   const [pasteError, setPasteError] = useState('');
   
-  const { count: scanCount } = useRealtimeScanCount(totalUsers);
-
   const handlePasteScan = () => {
     setPasteError('');
     const trimmed = pasteAddress.trim();
@@ -472,29 +416,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Live Scan Counter */}
-        <motion.div 
-          className="glass-card rounded-2xl p-3 sm:p-4"
+        {/* Buy Me A Coffee Button - Replaces Live Counter */}
+        <motion.button
+          onClick={onDonate}
+          className="glass-card rounded-2xl p-3 sm:p-4 w-full flex items-center justify-center gap-2 group hover:bg-white/10 transition-colors"
           variants={itemVariants}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <div className="flex items-center justify-center gap-2 sm:gap-3">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="relative">
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-base-blue drop-shadow-[0_0_6px_rgba(0,82,255,0.5)]" />
-                <motion.span 
-                  className="absolute -top-1 -right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)]"
-                  animate={{ scale: [1, 1.3, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              </div>
-              <span className="text-gray-300 text-xs sm:text-sm">Wallets Scanned</span>
-            </div>
-            <div className="font-mono text-lg sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-base-blue to-cyan-400 drop-shadow-[0_0_10px_rgba(0,82,255,0.3)]">
-              <AnimatedCounter value={scanCount} />
-            </div>
+          <div className="relative">
+            <Heart className="w-5 h-5 text-pink-500 group-hover:fill-pink-500 transition-colors duration-300" />
+            <motion.div
+              className="absolute inset-0 bg-pink-500/30 blur-lg rounded-full"
+              animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
           </div>
-          <p className="text-center text-gray-400 text-[9px] sm:text-[10px] mt-1.5 sm:mt-2">Live counter updating in real-time</p>
-        </motion.div>
+          <span className="text-gray-200 font-medium text-sm">Buy me a coffee</span>
+        </motion.button>
       </div>
     </motion.div>
   );
