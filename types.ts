@@ -44,6 +44,7 @@ export interface LeaderboardEntry {
   isLegend: boolean;
   pfp?: string;
   fid?: number;
+  txCount?: number;
 }
 
 export interface FarcasterUser {
