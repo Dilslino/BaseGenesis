@@ -231,14 +231,31 @@ export const FlexCard: React.FC<FlexCardProps> = ({ data, compact = false }) => 
               <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">BaseGenesis</span>
               <span className="text-xs font-bold text-white tracking-widest">ID SYSTEM</span>
            </div>
-           {/* Decorative Chip */}
-           <div className="w-8 h-6 sm:w-10 sm:h-7 rounded bg-gradient-to-br from-yellow-200/20 to-yellow-500/20 border border-white/10 flex items-center justify-center">
-              <div className="w-5 h-3 sm:w-6 sm:h-4 border border-white/10 rounded-[2px] flex gap-[2px]">
-                 <div className="w-[1px] h-full bg-white/20"></div>
-                 <div className="w-[1px] h-full bg-white/20"></div>
-                 <div className="w-[1px] h-full bg-white/20"></div>
-              </div>
-           </div>
+           
+           {/* User PFP or Decorative Chip */}
+           {data.pfpUrl ? (
+             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-white/20 shadow-lg relative">
+               <img 
+                 src={data.pfpUrl} 
+                 alt="User" 
+                 className="w-full h-full object-cover" 
+               />
+               <div className={`absolute inset-0 rounded-full border ${
+                 isOG ? 'border-yellow-500/50' : 
+                 isPioneer ? 'border-amber-500/50' : 
+                 isSettler ? 'border-cyan-500/50' : 
+                 'border-white/10'
+               }`}></div>
+             </div>
+           ) : (
+             <div className="w-8 h-6 sm:w-10 sm:h-7 rounded bg-gradient-to-br from-yellow-200/20 to-yellow-500/20 border border-white/10 flex items-center justify-center">
+                <div className="w-5 h-3 sm:w-6 sm:h-4 border border-white/10 rounded-[2px] flex gap-[2px]">
+                   <div className="w-[1px] h-full bg-white/20"></div>
+                   <div className="w-[1px] h-full bg-white/20"></div>
+                   <div className="w-[1px] h-full bg-white/20"></div>
+                </div>
+             </div>
+           )}
         </div>
 
         {/* Middle: Rank */}

@@ -31,6 +31,8 @@ export interface UserGenesisData {
   blockNumber: string;
   txCount?: number;
   achievements?: Achievement[];
+  pfpUrl?: string;
+  username?: string;
 }
 
 export interface LeaderboardEntry {

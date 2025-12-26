@@ -176,7 +176,7 @@ export async function POST(request: Request) {
       rank
     );
 
-    const userData = {
+    const userData: any = { // Use any temporarily or update interface import
       address,
       firstTxDate: txDate.toISOString(),
       firstTxHash: firstTx.hash,
@@ -193,7 +193,8 @@ export async function POST(request: Request) {
     
     if (supabase) {
       // A. Simpan/Update data user ke database (with txCount)
-      const { error: upsertError } = await supabase
+      // We also select pfp_url and username to return to the frontend
+      const { data: upsertData, error: upsertError } = await supabase
         .from('users')
         .upsert({
           address: address,
@@ -203,10 +204,16 @@ export async function POST(request: Request) {
           first_tx_hash: firstTx.hash,
           block_number: blockNumber,
           tx_count: txCount,
-        }, { onConflict: 'address' });
+        }, { onConflict: 'address' })
+        .select('pfp_url, username')
+        .single();
 
       if (upsertError) {
         console.error("Supabase Upsert Error:", upsertError);
+      } else if (upsertData) {
+        // Attach profile data to response
+        userData.pfpUrl = upsertData.pfp_url;
+        userData.username = upsertData.username;
       }
 
       // B. Ambil Top 50 Global Leaderboard dari Database

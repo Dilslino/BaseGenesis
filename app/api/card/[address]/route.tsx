@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { NextRequest } from 'next/server'
+import { getSupabaseClient } from '../../../../lib/supabase'
 
 export const runtime = 'edge'
 
@@ -104,6 +105,25 @@ export async function GET(
     const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
     
     const walletData = await getWalletData(address)
+
+    // Fetch user profile from Supabase for PFP
+    let userPfp = null
+    try {
+      const supabase = getSupabaseClient()
+      if (supabase) {
+        const { data } = await supabase
+          .from('users')
+          .select('pfp_url')
+          .eq('address', address) // Supabase query is case-insensitive usually but standardizing helps
+          .single()
+        
+        if (data && data.pfp_url) {
+          userPfp = data.pfp_url
+        }
+      }
+    } catch (err) {
+      console.warn('Error fetching user profile for card:', err)
+    }
     
     const rank = walletData?.rank || 'BASE CITIZEN'
     const rankConfig = RANK_CONFIG[rank] || RANK_CONFIG['BASE CITIZEN']
@@ -169,14 +189,30 @@ export async function GET(
                 <span style={{ fontSize: 16, color: '#64748b', letterSpacing: 4 }}>BASEGENESIS</span>
                 <span style={{ fontSize: 20, color: 'white', fontWeight: 700, letterSpacing: 2 }}>ID CARD</span>
               </div>
-              <div style={{ 
-                display: 'flex',
-                padding: '8px 16px',
-                background: 'rgba(0, 82, 255, 0.2)',
-                borderRadius: 8,
-                border: '1px solid rgba(0, 82, 255, 0.3)',
-              }}>
-                <span style={{ fontSize: 14, color: '#0052FF' }}>BASE</span>
+              
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                {userPfp && (
+                  <img
+                    src={userPfp}
+                    width="64"
+                    height="64"
+                    style={{
+                      borderRadius: 32,
+                      marginRight: 16,
+                      border: `2px solid ${rankConfig.color}`,
+                      objectFit: 'cover',
+                    }}
+                  />
+                )}
+                <div style={{ 
+                  display: 'flex',
+                  padding: '8px 16px',
+                  background: 'rgba(0, 82, 255, 0.2)',
+                  borderRadius: 8,
+                  border: '1px solid rgba(0, 82, 255, 0.3)',
+                }}>
+                  <span style={{ fontSize: 14, color: '#0052FF' }}>BASE</span>
+                </div>
               </div>
             </div>
 
