@@ -143,7 +143,7 @@ export async function GET(
             backgroundColor: '#0a0a0f',
             backgroundImage: 'linear-gradient(135deg, #050505 0%, #1a1a2e 50%, #16213e 100%)',
             fontFamily: 'sans-serif',
-            padding: 80, // Increased padding
+            padding: 100, // Increased padding significantly
             position: 'relative',
           }}
         >
@@ -161,41 +161,41 @@ export async function GET(
             position: 'absolute', 
             top: '50%', 
             left: '50%',
-            width: 800, 
-            height: 500, 
+            width: 700, // Smaller glow
+            height: 400, 
             background: rankConfig.glow,
-            filter: 'blur(180px)',
+            filter: 'blur(150px)',
             borderRadius: 9999,
             transform: 'translate(-50%, -50%)',
             display: 'flex',
-            opacity: 0.4 // Reduced opacity slightly
+            opacity: 0.3
           }} />
 
           {/* Border Gradient Line Top */}
           <div style={{
             position: 'absolute',
             top: 0, left: 0, right: 0,
-            height: 8,
+            height: 6, // Thinner
             background: rankConfig.gradient,
           }} />
 
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 10 }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: 20, color: '#94a3b8', letterSpacing: 6, fontWeight: 600 }}>BASEGENESIS</span>
-                <span style={{ fontSize: 28, color: 'white', fontWeight: 800, letterSpacing: 2, marginTop: 8 }}>ID SYSTEM</span>
+                <span style={{ fontSize: 16, color: '#94a3b8', letterSpacing: 5, fontWeight: 600 }}>BASEGENESIS</span>
+                <span style={{ fontSize: 24, color: 'white', fontWeight: 800, letterSpacing: 2, marginTop: 6 }}>ID SYSTEM</span>
               </div>
               
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {userPfp && (
                   <img
                     src={userPfp}
-                    width="80"
-                    height="80"
+                    width="64" // Smaller PFP
+                    height="64"
                     style={{
-                      borderRadius: 40,
-                      marginRight: 24,
-                      border: `3px solid ${rankConfig.color}`,
+                      borderRadius: 32,
+                      marginRight: 20,
+                      border: `2px solid ${rankConfig.color}`,
                       objectFit: 'cover',
                       boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
                     }}
@@ -203,13 +203,13 @@ export async function GET(
                 )}
                 <div style={{ 
                   display: 'flex',
-                  padding: '10px 20px',
+                  padding: '8px 16px',
                   background: 'rgba(0, 82, 255, 0.15)',
-                  borderRadius: 14,
-                  border: '2px solid rgba(0, 82, 255, 0.3)',
+                  borderRadius: 12,
+                  border: '1px solid rgba(0, 82, 255, 0.3)',
                   backdropFilter: 'blur(10px)'
                 }}>
-                  <span style={{ fontSize: 18, fontWeight: 700, color: '#4F8BFF' }}>BASE</span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#4F8BFF' }}>BASE</span>
                 </div>
               </div>
             </div>
@@ -217,25 +217,25 @@ export async function GET(
             {/* Rank Title (Center) */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', flex: 1, zIndex: 10 }}>
               <span style={{ 
-                fontSize: 72, // Reduced size
+                fontSize: 60, // Much smaller rank title
                 fontWeight: 900, 
                 color: 'transparent',
                 backgroundClip: 'text',
                 backgroundImage: rankConfig.gradient,
-                letterSpacing: -2,
+                letterSpacing: -1,
                 lineHeight: 1,
-                textShadow: `0 0 80px ${rankConfig.glow}`
+                textShadow: `0 0 60px ${rankConfig.glow}`
               }}>
                 {rank}
               </span>
               
               {/* Decorative line under rank */}
               <div style={{ 
-                width: 160, 
-                height: 5, 
+                width: 120, 
+                height: 4, 
                 background: rankConfig.gradient,
-                borderRadius: 3,
-                marginTop: 20,
+                borderRadius: 2,
+                marginTop: 16,
               }} />
             </div>
 
@@ -245,35 +245,35 @@ export async function GET(
               justifyContent: 'space-between', 
               alignItems: 'flex-end',
               background: 'rgba(0,0,0,0.3)',
-              borderRadius: 24,
-              padding: 28,
+              borderRadius: 20,
+              padding: 24,
               border: '1px solid rgba(255,255,255,0.1)',
               zIndex: 10
             }}>
-              <div style={{ display: 'flex', gap: 48 }}>
+              <div style={{ display: 'flex', gap: 40 }}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 14, color: '#94a3b8', marginBottom: 6, letterSpacing: 1 }}>JOINED</span>
-                  <span style={{ fontSize: 24, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{firstTxDate}</span>
+                  <span style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4, letterSpacing: 1 }}>JOINED</span>
+                  <span style={{ fontSize: 20, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{firstTxDate}</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 14, color: '#94a3b8', marginBottom: 6, letterSpacing: 1 }}>DAYS</span>
-                  <span style={{ fontSize: 24, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{daysSinceJoined}</span>
+                  <span style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4, letterSpacing: 1 }}>DAYS</span>
+                  <span style={{ fontSize: 20, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{daysSinceJoined}</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 14, color: '#94a3b8', marginBottom: 6, letterSpacing: 1 }}>BLOCK</span>
-                  <span style={{ fontSize: 24, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>#{blockNumber}</span>
+                  <span style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4, letterSpacing: 1 }}>BLOCK</span>
+                  <span style={{ fontSize: 20, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>#{blockNumber}</span>
                 </div>
               </div>
               
               {/* Address Badge */}
               <div style={{ 
                 display: 'flex', 
-                padding: '8px 16px',
+                padding: '6px 14px',
                 background: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: 12,
+                borderRadius: 10,
                 border: '1px solid rgba(255, 255, 255, 0.1)',
               }}>
-                <span style={{ fontSize: 18, color: '#cbd5e1', fontFamily: 'monospace' }}>{shortAddress}</span>
+                <span style={{ fontSize: 16, color: '#cbd5e1', fontFamily: 'monospace' }}>{shortAddress}</span>
               </div>
             </div>
 
@@ -281,7 +281,7 @@ export async function GET(
       ),
       { 
         width: 1200,
-        height: 630,
+        height: 800, // Changed to 3:2 aspect ratio for Farcaster
         headers: {
           'Cache-Control': 'public, max-age=300, s-maxage=300',
           'Content-Type': 'image/png',
