@@ -43,6 +43,13 @@ export const RANK_EMOJI: Record<UserRank, string> = {
   [UserRank.UNKNOWN]: "❓"
 };
 
+export const RANK_IMAGES: Record<string, string> = {
+  'OG': "/ranks/OG.jpg",
+  'Pioneer': "/ranks/Pioneer.jpg",
+  'Settler': "/ranks/Settler.jpg",
+  'Citizen': "/ranks/Citizen.jpg",
+};
+
 export const ACHIEVEMENTS_LIST: Achievement[] = [
   { id: 'first_tx', title: 'First Step', description: 'Made your first transaction on Base', icon: '👣', unlocked: false },
   { id: 'pioneer', title: 'Genesis Pioneer', description: 'Joined Base in the first month', icon: '🏆', unlocked: false },

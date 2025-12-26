@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Wallet, LogOut, Search, ChevronRight, Award, Calendar, Activity, Sparkles, Heart } from 'lucide-react';
 import { Button } from './Button';
 import { UserGenesisData } from '../types';
-import { RANK_EMOJI, RANK_BADGE_COLORS, RANK_COLORS } from '../constants';
+import { RANK_EMOJI, RANK_IMAGES, RANK_BADGE_COLORS, RANK_COLORS } from '../constants';
 
 interface HomeViewProps {
   isConnected: boolean;
@@ -393,10 +393,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <p className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-widest text-center">Possible Genesis Ranks</p>
               <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
                 {[
-                  { icon: '👑', name: 'OG', desc: 'Legend', color: 'yellow' },
-                  { icon: '🏆', name: 'Pioneer', desc: 'Day 1', color: 'amber' },
-                  { icon: '⚡', name: 'Settler', desc: 'Early', color: 'cyan' },
-                  { icon: '🌐', name: 'Citizen', desc: 'Builder', color: 'slate' },
+                  { name: 'OG', desc: 'Legend', color: 'yellow', img: RANK_IMAGES['OG'] },
+                  { name: 'Pioneer', desc: 'Day 1', color: 'amber', img: RANK_IMAGES['Pioneer'] },
+                  { name: 'Settler', desc: 'Early', color: 'cyan', img: RANK_IMAGES['Settler'] },
+                  { name: 'Citizen', desc: 'Builder', color: 'slate', img: RANK_IMAGES['Citizen'] },
                 ].map((rank, i) => (
                   <motion.div 
                     key={rank.name}
@@ -406,7 +406,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
                   >
-                    <span className={`text-lg sm:text-xl drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]`}>{rank.icon}</span>
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-1 rounded-full overflow-hidden border-2 border-white/10 shadow-lg">
+                      <img src={rank.img} alt={rank.name} className="w-full h-full object-cover" />
+                    </div>
                     <p className={`text-${rank.color}-400 text-[10px] sm:text-[11px] font-bold mt-1`}>{rank.name}</p>
                     <p className="text-gray-400 text-[8px] sm:text-[9px]">{rank.desc}</p>
                   </motion.div>
