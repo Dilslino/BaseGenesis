@@ -114,7 +114,7 @@ export async function GET(
         const { data } = await supabase
           .from('users')
           .select('pfp_url')
-          .eq('address', address) // Supabase query is case-insensitive usually but standardizing helps
+          .ilike('address', address) // Case-insensitive match
           .single()
         
         if (data && data.pfp_url) {
@@ -139,138 +139,149 @@ export async function GET(
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             backgroundColor: '#0a0a0f',
+            backgroundImage: 'linear-gradient(135deg, #050505 0%, #1a1a2e 50%, #16213e 100%)',
             fontFamily: 'sans-serif',
+            padding: 60,
+            position: 'relative',
           }}
         >
-          {/* Background */}
-          <div style={{ 
-            position: 'absolute', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            bottom: 0,
-            background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
-            display: 'flex',
+          {/* Background Pattern/Noise (Optional overlay) */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            opacity: 0.1,
+            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)',
+            backgroundSize: '32px 32px',
           }} />
-          
+
           {/* Glow Effect */}
           <div style={{ 
             position: 'absolute', 
             top: '50%', 
             left: '50%',
-            width: 500, 
-            height: 300, 
+            width: 800, 
+            height: 500, 
             background: rankConfig.glow,
-            filter: 'blur(120px)',
+            filter: 'blur(180px)',
             borderRadius: 9999,
             transform: 'translate(-50%, -50%)',
             display: 'flex',
+            opacity: 0.5
           }} />
 
-          {/* Card Container */}
+          {/* Border Gradient Line Top */}
           <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: 700,
-            height: 480,
-            background: 'rgba(20, 20, 30, 0.9)',
-            borderRadius: 32,
-            border: '2px solid rgba(255, 255, 255, 0.1)',
-            padding: 48,
-            position: 'relative',
-          }}>
-            
+            position: 'absolute',
+            top: 0, left: 0, right: 0,
+            height: 8,
+            background: rankConfig.gradient,
+          }} />
+
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 10 }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: 16, color: '#64748b', letterSpacing: 4 }}>BASEGENESIS</span>
-                <span style={{ fontSize: 20, color: 'white', fontWeight: 700, letterSpacing: 2 }}>ID CARD</span>
+                <span style={{ fontSize: 24, color: '#94a3b8', letterSpacing: 6, fontWeight: 600 }}>BASEGENESIS</span>
+                <span style={{ fontSize: 32, color: 'white', fontWeight: 800, letterSpacing: 2, marginTop: 8 }}>ID SYSTEM</span>
               </div>
               
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {userPfp && (
                   <img
                     src={userPfp}
-                    width="64"
-                    height="64"
+                    width="96"
+                    height="96"
                     style={{
-                      borderRadius: 32,
-                      marginRight: 16,
-                      border: `2px solid ${rankConfig.color}`,
+                      borderRadius: 48,
+                      marginRight: 24,
+                      border: `4px solid ${rankConfig.color}`,
                       objectFit: 'cover',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
                     }}
                   />
                 )}
                 <div style={{ 
                   display: 'flex',
-                  padding: '8px 16px',
-                  background: 'rgba(0, 82, 255, 0.2)',
-                  borderRadius: 8,
-                  border: '1px solid rgba(0, 82, 255, 0.3)',
+                  padding: '12px 24px',
+                  background: 'rgba(0, 82, 255, 0.15)',
+                  borderRadius: 16,
+                  border: '2px solid rgba(0, 82, 255, 0.3)',
+                  backdropFilter: 'blur(10px)'
                 }}>
-                  <span style={{ fontSize: 14, color: '#0052FF' }}>BASE</span>
+                  <span style={{ fontSize: 20, fontWeight: 700, color: '#4F8BFF' }}>BASE</span>
                 </div>
               </div>
             </div>
 
-            {/* Rank Title */}
-            <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 40 }}>
+            {/* Rank Title (Center) */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', flex: 1, zIndex: 10 }}>
               <span style={{ 
-                fontSize: 56, 
+                fontSize: 84, 
                 fontWeight: 900, 
-                color: rankConfig.color,
-                letterSpacing: 2,
+                color: 'transparent',
+                backgroundClip: 'text',
+                backgroundImage: rankConfig.gradient,
+                letterSpacing: -2,
+                lineHeight: 1,
+                textShadow: `0 0 80px ${rankConfig.glow}`
               }}>
                 {rank}
               </span>
+              
+              {/* Decorative line under rank */}
               <div style={{ 
-                width: 120, 
-                height: 4, 
+                width: 200, 
+                height: 6, 
                 background: rankConfig.gradient,
-                borderRadius: 2,
-                marginTop: 12,
-                display: 'flex',
+                borderRadius: 3,
+                marginTop: 24,
               }} />
             </div>
 
-            {/* Stats Row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto' }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: 14, color: '#64748b', marginBottom: 4 }}>JOINED</span>
-                <span style={{ fontSize: 20, color: 'white', fontWeight: 600 }}>{firstTxDate}</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <span style={{ fontSize: 14, color: '#64748b', marginBottom: 4 }}>DAYS ON BASE</span>
-                <span style={{ fontSize: 20, color: 'white', fontWeight: 600 }}>{daysSinceJoined}</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                <span style={{ fontSize: 14, color: '#64748b', marginBottom: 4 }}>FIRST BLOCK</span>
-                <span style={{ fontSize: 20, color: 'white', fontWeight: 600 }}>#{blockNumber}</span>
-              </div>
-            </div>
-
-            {/* Address */}
+            {/* Footer Stats */}
             <div style={{ 
               display: 'flex', 
-              justifyContent: 'center',
-              marginTop: 24,
-              padding: '12px 24px',
-              background: 'rgba(0, 82, 255, 0.1)',
-              borderRadius: 12,
-              border: '1px solid rgba(0, 82, 255, 0.2)',
+              justifyContent: 'space-between', 
+              alignItems: 'flex-end',
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: 24,
+              padding: 32,
+              border: '1px solid rgba(255,255,255,0.1)',
+              zIndex: 10
             }}>
-              <span style={{ fontSize: 18, color: '#0052FF', fontFamily: 'monospace' }}>{shortAddress}</span>
+              <div style={{ display: 'flex', gap: 60 }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: 16, color: '#94a3b8', marginBottom: 8, letterSpacing: 1 }}>JOINED</span>
+                  <span style={{ fontSize: 28, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{firstTxDate}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: 16, color: '#94a3b8', marginBottom: 8, letterSpacing: 1 }}>DAYS</span>
+                  <span style={{ fontSize: 28, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{daysSinceJoined}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: 16, color: '#94a3b8', marginBottom: 8, letterSpacing: 1 }}>BLOCK</span>
+                  <span style={{ fontSize: 28, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>#{blockNumber}</span>
+                </div>
+              </div>
+              
+              {/* Address Badge */}
+              <div style={{ 
+                display: 'flex', 
+                padding: '8px 20px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: 12,
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}>
+                <span style={{ fontSize: 20, color: '#cbd5e1', fontFamily: 'monospace' }}>{shortAddress}</span>
+              </div>
             </div>
-          </div>
 
         </div>
       ),
       { 
         width: 1200,
-        height: 800,
+        height: 630,
         headers: {
           'Cache-Control': 'public, max-age=300, s-maxage=300',
           'Content-Type': 'image/png',
