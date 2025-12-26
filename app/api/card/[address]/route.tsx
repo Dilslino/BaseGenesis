@@ -143,7 +143,7 @@ export async function GET(
             backgroundColor: '#0a0a0f',
             backgroundImage: 'linear-gradient(135deg, #050505 0%, #1a1a2e 50%, #16213e 100%)',
             fontFamily: 'sans-serif',
-            padding: 60,
+            padding: 80, // Increased padding
             position: 'relative',
           }}
         >
@@ -168,7 +168,7 @@ export async function GET(
             borderRadius: 9999,
             transform: 'translate(-50%, -50%)',
             display: 'flex',
-            opacity: 0.5
+            opacity: 0.4 // Reduced opacity slightly
           }} />
 
           {/* Border Gradient Line Top */}
@@ -182,20 +182,20 @@ export async function GET(
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 10 }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: 24, color: '#94a3b8', letterSpacing: 6, fontWeight: 600 }}>BASEGENESIS</span>
-                <span style={{ fontSize: 32, color: 'white', fontWeight: 800, letterSpacing: 2, marginTop: 8 }}>ID SYSTEM</span>
+                <span style={{ fontSize: 20, color: '#94a3b8', letterSpacing: 6, fontWeight: 600 }}>BASEGENESIS</span>
+                <span style={{ fontSize: 28, color: 'white', fontWeight: 800, letterSpacing: 2, marginTop: 8 }}>ID SYSTEM</span>
               </div>
               
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {userPfp && (
                   <img
                     src={userPfp}
-                    width="96"
-                    height="96"
+                    width="80"
+                    height="80"
                     style={{
-                      borderRadius: 48,
+                      borderRadius: 40,
                       marginRight: 24,
-                      border: `4px solid ${rankConfig.color}`,
+                      border: `3px solid ${rankConfig.color}`,
                       objectFit: 'cover',
                       boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
                     }}
@@ -203,13 +203,13 @@ export async function GET(
                 )}
                 <div style={{ 
                   display: 'flex',
-                  padding: '12px 24px',
+                  padding: '10px 20px',
                   background: 'rgba(0, 82, 255, 0.15)',
-                  borderRadius: 16,
+                  borderRadius: 14,
                   border: '2px solid rgba(0, 82, 255, 0.3)',
                   backdropFilter: 'blur(10px)'
                 }}>
-                  <span style={{ fontSize: 20, fontWeight: 700, color: '#4F8BFF' }}>BASE</span>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: '#4F8BFF' }}>BASE</span>
                 </div>
               </div>
             </div>
@@ -217,7 +217,7 @@ export async function GET(
             {/* Rank Title (Center) */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', flex: 1, zIndex: 10 }}>
               <span style={{ 
-                fontSize: 84, 
+                fontSize: 72, // Reduced size
                 fontWeight: 900, 
                 color: 'transparent',
                 backgroundClip: 'text',
@@ -231,11 +231,11 @@ export async function GET(
               
               {/* Decorative line under rank */}
               <div style={{ 
-                width: 200, 
-                height: 6, 
+                width: 160, 
+                height: 5, 
                 background: rankConfig.gradient,
                 borderRadius: 3,
-                marginTop: 24,
+                marginTop: 20,
               }} />
             </div>
 
@@ -246,34 +246,34 @@ export async function GET(
               alignItems: 'flex-end',
               background: 'rgba(0,0,0,0.3)',
               borderRadius: 24,
-              padding: 32,
+              padding: 28,
               border: '1px solid rgba(255,255,255,0.1)',
               zIndex: 10
             }}>
-              <div style={{ display: 'flex', gap: 60 }}>
+              <div style={{ display: 'flex', gap: 48 }}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 16, color: '#94a3b8', marginBottom: 8, letterSpacing: 1 }}>JOINED</span>
-                  <span style={{ fontSize: 28, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{firstTxDate}</span>
+                  <span style={{ fontSize: 14, color: '#94a3b8', marginBottom: 6, letterSpacing: 1 }}>JOINED</span>
+                  <span style={{ fontSize: 24, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{firstTxDate}</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 16, color: '#94a3b8', marginBottom: 8, letterSpacing: 1 }}>DAYS</span>
-                  <span style={{ fontSize: 28, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{daysSinceJoined}</span>
+                  <span style={{ fontSize: 14, color: '#94a3b8', marginBottom: 6, letterSpacing: 1 }}>DAYS</span>
+                  <span style={{ fontSize: 24, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{daysSinceJoined}</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 16, color: '#94a3b8', marginBottom: 8, letterSpacing: 1 }}>BLOCK</span>
-                  <span style={{ fontSize: 28, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>#{blockNumber}</span>
+                  <span style={{ fontSize: 14, color: '#94a3b8', marginBottom: 6, letterSpacing: 1 }}>BLOCK</span>
+                  <span style={{ fontSize: 24, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>#{blockNumber}</span>
                 </div>
               </div>
               
               {/* Address Badge */}
               <div style={{ 
                 display: 'flex', 
-                padding: '8px 20px',
+                padding: '8px 16px',
                 background: 'rgba(255, 255, 255, 0.05)',
                 borderRadius: 12,
                 border: '1px solid rgba(255, 255, 255, 0.1)',
               }}>
-                <span style={{ fontSize: 20, color: '#cbd5e1', fontFamily: 'monospace' }}>{shortAddress}</span>
+                <span style={{ fontSize: 18, color: '#cbd5e1', fontFamily: 'monospace' }}>{shortAddress}</span>
               </div>
             </div>
 
