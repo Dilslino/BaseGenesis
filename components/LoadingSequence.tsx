@@ -1,153 +1,101 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Database, Activity, Clock, ShieldCheck, CreditCard, Loader2 } from 'lucide-react';
 
-const MESSAGES = [
-  { text: "Resolving ENS...", icon: "🔍" },
-  { text: "Querying Base Node...", icon: "🌐" },
-  { text: "Scanning Transaction History...", icon: "📜" },
-  { text: "Calculating Block Timestamps...", icon: "⏱️" },
-  { text: "Verifying Genesis Proof...", icon: "✅" },
-  { text: "Generating Flex Card...", icon: "🎴" }
+const STEPS = [
+  { text: "RESOLVING ENS...", icon: Search },
+  { text: "QUERYING NODE...", icon: Database },
+  { text: "SCANNING HISTORY...", icon: Activity },
+  { text: "CALCULATING...", icon: Clock },
+  { text: "VERIFYING PROOF...", icon: ShieldCheck },
+  { text: "GENERATING CARD...", icon: CreditCard }
 ];
 
 export const LoadingSequence: React.FC = () => {
-  const [msgIndex, setMsgIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [stepIndex, setStepIndex] = useState(0);
 
   useEffect(() => {
-    const messageInterval = setInterval(() => {
-      setMsgIndex((prev) => {
-        const next = (prev + 1) % MESSAGES.length;
-        return next;
-      });
+    const interval = setInterval(() => {
+      setStepIndex((prev) => (prev + 1) % STEPS.length);
     }, 1200);
-    
-    return () => clearInterval(messageInterval);
+    return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) return 0;
-        return prev + 2;
-      });
-    }, 50);
-    
-    return () => clearInterval(progressInterval);
-  }, []);
+  const CurrentIcon = STEPS[stepIndex].icon;
 
   return (
     <motion.div 
-      className="flex flex-col items-center justify-center space-y-6"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
+      className="flex flex-col items-center justify-center space-y-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
     >
-      {/* Animated Logo/Spinner */}
-      <div className="relative w-20 h-20">
-        {/* Outer rotating ring */}
+      {/* Central Visual */}
+      <div className="relative w-24 h-24 flex items-center justify-center">
+        {/* Spinner Ring */}
         <motion.div 
-          className="absolute inset-0 rounded-full border-2 border-dashed border-base-blue/30"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          className="absolute inset-0 border-2 border-white/5 rounded-full"
         />
-        
-        {/* Middle spinning ring */}
         <motion.div 
-          className="absolute inset-2 rounded-full border-2 border-transparent border-t-base-blue border-r-base-blue/50"
-          animate={{ rotate: -360 }}
+          className="absolute inset-0 border-t-2 border-base-blue rounded-full"
+          animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
         />
         
-        {/* Inner pulsing circle */}
-        <motion.div 
-          className="absolute inset-4 rounded-full bg-gradient-to-br from-base-blue/30 to-purple-500/20"
-          animate={{ 
-            scale: [1, 1.1, 1],
-            opacity: [0.5, 0.8, 0.5]
-          }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        />
-        
-        {/* Center icon */}
-        <motion.div 
-          className="absolute inset-0 flex items-center justify-center"
-          key={msgIndex}
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", damping: 15, stiffness: 200 }}
-        >
-          <span className="text-2xl">{MESSAGES[msgIndex].icon}</span>
-        </motion.div>
-        
-        {/* Glow effect */}
-        <motion.div 
-          className="absolute inset-0 rounded-full bg-base-blue/20 blur-xl"
-          animate={{ 
-            opacity: [0.3, 0.6, 0.3],
-            scale: [0.8, 1.1, 0.8]
-          }}
-          transition={{ duration: 2, repeat: Infinity }}
-        />
+        {/* Glow */}
+        <div className="absolute inset-0 bg-base-blue/20 blur-2xl rounded-full animate-pulse-slow" />
+
+        {/* Changing Icon */}
+        <div className="relative z-10 w-10 h-10 flex items-center justify-center bg-[#0a0a0a] rounded-xl border border-white/10 shadow-lg">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={stepIndex}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <CurrentIcon className="w-5 h-5 text-base-blue" />
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
-      
-      {/* Message with animation */}
-      <div className="h-8 flex items-center justify-center overflow-hidden">
+
+      {/* Text Info */}
+      <div className="flex flex-col items-center space-y-3">
         <AnimatePresence mode="wait">
-          <motion.span 
-            key={msgIndex}
-            className="text-sm font-mono text-base-blue uppercase tracking-widest text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+          <motion.p 
+            key={stepIndex}
+            className="text-sm font-mono text-white tracking-[0.2em] font-bold"
+            initial={{ y: 5, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -5, opacity: 0 }}
           >
-            {MESSAGES[msgIndex].text}
-          </motion.span>
+            {STEPS[stepIndex].text}
+          </motion.p>
         </AnimatePresence>
-      </div>
-
-      {/* Progress bar */}
-      <div className="w-48 h-1.5 bg-white/10 rounded-full overflow-hidden">
-        <motion.div 
-          className="h-full bg-gradient-to-r from-base-blue via-purple-500 to-base-blue rounded-full"
-          style={{ 
-            width: `${progress}%`,
-          }}
-          transition={{ duration: 0.1 }}
-        />
-      </div>
-
-      {/* Step indicators */}
-      <div className="flex items-center gap-2">
-        {MESSAGES.map((_, index) => (
-          <motion.div
-            key={index}
-            className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-              index === msgIndex 
-                ? 'bg-base-blue shadow-[0_0_8px_rgba(0,82,255,0.6)]' 
-                : index < msgIndex 
-                  ? 'bg-base-blue/50' 
-                  : 'bg-white/20'
-            }`}
-            animate={{
-              scale: index === msgIndex ? 1.2 : 1,
+        
+        {/* Progress Bar */}
+        <div className="w-48 h-[2px] bg-white/10 rounded-full overflow-hidden">
+          <motion.div 
+            className="h-full bg-base-blue box-shadow-[0_0_10px_rgba(0,82,255,0.5)]"
+            initial={{ width: "0%" }}
+            animate={{ width: "100%" }}
+            transition={{ 
+              duration: STEPS.length * 1.2, 
+              ease: "linear",
+              repeat: Infinity
             }}
-            transition={{ duration: 0.2 }}
           />
-        ))}
+        </div>
+        
+        <p className="text-[10px] text-gray-500 font-mono mt-2">
+          EST. TIME: ~5s
+        </p>
       </div>
-
-      {/* Subtle hint */}
-      <motion.p 
-        className="text-gray-500 text-[10px] uppercase tracking-wider"
-        animate={{ opacity: [0.5, 0.8, 0.5] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        Analyzing blockchain data...
-      </motion.p>
     </motion.div>
   );
 };
