@@ -416,23 +416,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Buy Me A Coffee Button - Replaces Live Counter */}
-        <motion.button
+        {/* Buy Me A Coffee - Subtle link style like ProfileView */}
+        <motion.button 
           onClick={onDonate}
-          className="glass-card rounded-2xl p-3 sm:p-4 w-full flex items-center justify-center gap-2 group hover:bg-white/10 transition-colors"
+          className="group flex items-center justify-center gap-2 py-3 text-gray-500 hover:text-white transition-all duration-300"
           variants={itemVariants}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <div className="relative">
-            <Heart className="w-5 h-5 text-pink-500 group-hover:fill-pink-500 transition-colors duration-300" />
-            <motion.div
-              className="absolute inset-0 bg-pink-500/30 blur-lg rounded-full"
-              animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          </div>
-          <span className="text-gray-200 font-medium text-sm">Buy me a coffee</span>
+          <Heart className="w-3.5 h-3.5 group-hover:text-pink-400 group-hover:fill-pink-400 transition-colors" />
+          <span className="text-xs">Buy me a coffee</span>
         </motion.button>
       </div>
     </motion.div>
