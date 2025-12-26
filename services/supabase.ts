@@ -72,6 +72,8 @@ export const getLeaderboard = async (limit: number = 100): Promise<LeaderboardEn
     const { data, error } = await supabase
       .from('users')
       .select('*')
+      .not('username', 'is', null) // Only users with username (Farcaster connected)
+      .neq('username', '') // Ensure username is not empty
       .order('days_since_joined', { ascending: false })
       .limit(limit);
 

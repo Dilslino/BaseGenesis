@@ -219,19 +219,23 @@ export async function POST(request: Request) {
       // B. Ambil Top 50 Global Leaderboard dari Database
       const { data: dbLeaderboard, error: fetchError } = await supabase
         .from('users')
-        .select('address, rank, days_since_joined, tx_count')
+        .select('address, rank, days_since_joined, tx_count, username, pfp_url, fid')
+        .not('username', 'is', null) // Only users with username
+        .neq('username', '') // Ensure not empty
         .order('days_since_joined', { ascending: false })
         .limit(50);
 
       if (!fetchError && dbLeaderboard) {
         realLeaderboard = dbLeaderboard.map((user: any, index: number) => ({
           rank: index + 1,
-          name: user.address === address ? "You" : `User ${user.address.slice(0,4)}`,
+          name: user.username, // Use real username
           address: user.address,
           status: user.rank as UserRank,
           days: user.days_since_joined,
           isLegend: user.rank === UserRank.OG_LEGEND,
           txCount: user.tx_count || 0,
+          pfp: user.pfp_url,
+          fid: user.fid
         }));
       }
     }
