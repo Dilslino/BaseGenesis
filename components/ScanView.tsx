@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Scan } from 'lucide-react';
+import { Scan, Crown, Activity, Award, CreditCard } from 'lucide-react';
 import { Button } from './Button';
 import { LoadingSequence } from './LoadingSequence';
 
@@ -165,30 +165,33 @@ export const ScanView: React.FC<ScanViewProps> = ({
       )}
 
       {/* Features List */}
-      <motion.div 
-        className="mt-4 grid grid-cols-2 gap-3 w-full max-w-xs"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-      >
-        {[
-          { icon: '🎯', text: 'Genesis Rank' },
-          { icon: '📊', text: 'TX Count' },
-          { icon: '🏆', text: 'Achievements' },
-          { icon: '🎴', text: 'Flex Card' },
-        ].map((feature, i) => (
-          <motion.div
-            key={feature.text}
-            className="flex items-center gap-2 text-xs text-gray-400"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6 + i * 0.1 }}
-          >
-            <span>{feature.icon}</span>
-            <span>{feature.text}</span>
-          </motion.div>
-        ))}
-      </motion.div>
+        <motion.div 
+          className="mt-6 w-full max-w-xs"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { icon: Crown, text: 'Genesis Rank' },
+              { icon: Activity, text: 'TX Count' },
+              { icon: Award, text: 'Achievements' },
+              { icon: CreditCard, text: 'Flex Card' },
+            ].map((feature, i) => (
+              <motion.div
+                key={feature.text}
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 + i * 0.1 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <feature.icon className="w-4 h-4 text-base-blue" />
+                <span className="text-xs text-gray-300 font-medium">{feature.text}</span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
     </motion.div>
   );
 };
