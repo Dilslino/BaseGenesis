@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   // Dynamic card image via Next.js API route
   const timestamp = new Date().getTime(); // Use timestamp only for dev testing or versioning
-  const cardImageUrl = `https://basegenesis.vercel.app/api/card/${address}?v=7` // Bump version to force cache refresh
+  const cardImageUrl = `https://basegenesis.vercel.app/api/card/${address}?v=8` // Bump version to force cache refresh
   const shareUrl = `https://basegenesis.vercel.app/share/${address}`
   const appUrl = `https://basegenesis.vercel.app`
   const splashImageUrl = `https://basegenesis.vercel.app/logo.jpg`
