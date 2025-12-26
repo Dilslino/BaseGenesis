@@ -15,8 +15,8 @@ let initialized = false;
 // Detect environment and get appropriate credentials
 function getSupabaseCredentials(): { url: string; key: string } | null {
   // Check for Next.js public environment variables (available on client & server)
-  const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const publicAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const publicAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
   // Check for server-side only variables
   // Note: NEXT_PUBLIC_ variables are also available on server, but we prefer service role if available for server-side logic
