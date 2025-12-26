@@ -1,34 +1,39 @@
+
 import { ImageResponse } from 'next/og'
 import { NextRequest } from 'next/server'
 import { getSupabaseClient } from '../../../../lib/supabase'
 
 export const runtime = 'edge'
 
-// Rank configurations
-const RANK_CONFIG: Record<string, { gradient: string; glow: string; label: string; color: string }> = {
+// Rank configurations matching FlexCard styles
+const RANK_CONFIG: Record<string, { gradient: string; border: string; glow: string; color: string; icon: string }> = {
   'OG LEGEND': {
-    gradient: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ea580c 100%)',
-    glow: 'rgba(251, 191, 36, 0.5)',
-    label: 'OG LEGEND',
-    color: '#fbbf24'
+    gradient: 'linear-gradient(135deg, rgba(10,8,5,0.95) 0%, rgba(5,5,8,0.9) 50%, rgba(8,5,2,0.95) 100%)',
+    border: 'rgba(234, 179, 8, 0.4)', // yellow-500/40
+    glow: 'rgba(234, 179, 8, 0.3)',
+    color: '#FCD34D', // amber-300
+    icon: '👑'
   },
   'GENESIS PIONEER': {
-    gradient: 'linear-gradient(135deg, #fcd34d 0%, #f97316 50%, #fbbf24 100%)',
-    glow: 'rgba(245, 158, 11, 0.4)',
-    label: 'GENESIS PIONEER',
-    color: '#f97316'
+    gradient: 'linear-gradient(135deg, rgba(8,5,5,0.95) 0%, rgba(5,5,8,0.9) 50%, rgba(5,5,2,0.95) 100%)',
+    border: 'rgba(245, 158, 11, 0.3)', // amber-500/30
+    glow: 'rgba(245, 158, 11, 0.25)',
+    color: '#FDBA74', // orange-300
+    icon: '🏆'
   },
   'EARLY SETTLER': {
-    gradient: 'linear-gradient(135deg, #22d3ee 0%, #14b8a6 50%, #06b6d4 100%)',
-    glow: 'rgba(6, 182, 212, 0.4)',
-    label: 'EARLY SETTLER',
-    color: '#06b6d4'
+    gradient: 'linear-gradient(135deg, rgba(5,16,21,0.95) 0%, rgba(5,5,16,0.9) 50%, rgba(5,16,16,0.95) 100%)',
+    border: 'rgba(6, 182, 212, 0.3)', // cyan-500/30
+    glow: 'rgba(6, 182, 212, 0.25)',
+    color: '#67E8F9', // cyan-300
+    icon: '⚡'
   },
   'BASE CITIZEN': {
-    gradient: 'linear-gradient(135deg, #94a3b8 0%, #64748b 50%, #94a3b8 100%)',
-    glow: 'rgba(148, 163, 184, 0.3)',
-    label: 'BASE CITIZEN',
-    color: '#94a3b8'
+    gradient: 'linear-gradient(135deg, rgba(10,10,16,0.95) 0%, rgba(8,8,18,0.9) 50%, rgba(10,10,15,0.95) 100%)',
+    border: 'rgba(100, 116, 139, 0.25)', // slate-500/25
+    glow: 'rgba(148, 163, 184, 0.2)',
+    color: '#CBD5E1', // slate-300
+    icon: '🌐'
   },
 }
 
@@ -89,6 +94,7 @@ async function getWalletData(address: string) {
       daysSinceJoined,
       firstTxDate: txDate.toLocaleDateString('en-US', { year: '2-digit', month: 'short', day: 'numeric' }),
       blockNumber: firstTx.blockNumber,
+      firstTxHash: firstTx.hash,
     }
   } catch (error) {
     console.error('Error fetching wallet data:', error)
@@ -97,12 +103,11 @@ async function getWalletData(address: string) {
 }
 
 export async function GET(
-  request: NextRequest,
+  _: NextRequest,
   { params }: { params: Promise<{ address: string }> }
 ) {
   try {
     const { address } = await params
-    const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
     
     const walletData = await getWalletData(address)
 
@@ -114,7 +119,7 @@ export async function GET(
         const { data } = await supabase
           .from('users')
           .select('pfp_url')
-          .ilike('address', address) // Case-insensitive match
+          .ilike('address', address)
           .single()
         
         if (data && data.pfp_url) {
@@ -130,168 +135,10 @@ export async function GET(
     const daysSinceJoined = walletData?.daysSinceJoined || 0
     const firstTxDate = walletData?.firstTxDate || 'Unknown'
     const blockNumber = walletData?.blockNumber || '0'
+    const txHash = walletData?.firstTxHash ? `${walletData.firstTxHash.slice(0, 4)}...${walletData.firstTxHash.slice(-4)}` : '0x...';
 
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            height: '100%',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            backgroundColor: '#0a0a0f',
-            backgroundImage: 'linear-gradient(135deg, #050505 0%, #1a1a2e 50%, #16213e 100%)',
-            fontFamily: 'sans-serif',
-            padding: 100, // Increased padding significantly
-            position: 'relative',
-          }}
-        >
-          {/* Background Pattern/Noise (Optional overlay) */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            opacity: 0.1,
-            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)',
-            backgroundSize: '32px 32px',
-          }} />
+    const rankTitle = rank.split(' '); // ["OG", "LEGEND"]
 
-          {/* Glow Effect */}
-          <div style={{ 
-            position: 'absolute', 
-            top: '50%', 
-            left: '50%',
-            width: 700, // Smaller glow
-            height: 400, 
-            background: rankConfig.glow,
-            filter: 'blur(150px)',
-            borderRadius: 9999,
-            transform: 'translate(-50%, -50%)',
-            display: 'flex',
-            opacity: 0.3
-          }} />
-
-          {/* Border Gradient Line Top */}
-          <div style={{
-            position: 'absolute',
-            top: 0, left: 0, right: 0,
-            height: 6, // Thinner
-            background: rankConfig.gradient,
-          }} />
-
-            {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 10 }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: 16, color: '#94a3b8', letterSpacing: 5, fontWeight: 600 }}>BASEGENESIS</span>
-                <span style={{ fontSize: 24, color: 'white', fontWeight: 800, letterSpacing: 2, marginTop: 6 }}>ID SYSTEM</span>
-              </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                {userPfp && (
-                  <img
-                    src={userPfp}
-                    width="64" // Smaller PFP
-                    height="64"
-                    style={{
-                      borderRadius: 32,
-                      marginRight: 20,
-                      border: `2px solid ${rankConfig.color}`,
-                      objectFit: 'cover',
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
-                    }}
-                  />
-                )}
-                <div style={{ 
-                  display: 'flex',
-                  padding: '8px 16px',
-                  background: 'rgba(0, 82, 255, 0.15)',
-                  borderRadius: 12,
-                  border: '1px solid rgba(0, 82, 255, 0.3)',
-                  backdropFilter: 'blur(10px)'
-                }}>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: '#4F8BFF' }}>BASE</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Rank Title (Center) */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', flex: 1, zIndex: 10 }}>
-              <span style={{ 
-                fontSize: 60, // Much smaller rank title
-                fontWeight: 900, 
-                color: 'transparent',
-                backgroundClip: 'text',
-                backgroundImage: rankConfig.gradient,
-                letterSpacing: -1,
-                lineHeight: 1,
-                textShadow: `0 0 60px ${rankConfig.glow}`
-              }}>
-                {rank}
-              </span>
-              
-              {/* Decorative line under rank */}
-              <div style={{ 
-                width: 120, 
-                height: 4, 
-                background: rankConfig.gradient,
-                borderRadius: 2,
-                marginTop: 16,
-              }} />
-            </div>
-
-            {/* Footer Stats */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'flex-end',
-              background: 'rgba(0,0,0,0.3)',
-              borderRadius: 20,
-              padding: 24,
-              border: '1px solid rgba(255,255,255,0.1)',
-              zIndex: 10
-            }}>
-              <div style={{ display: 'flex', gap: 40 }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4, letterSpacing: 1 }}>JOINED</span>
-                  <span style={{ fontSize: 20, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{firstTxDate}</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4, letterSpacing: 1 }}>DAYS</span>
-                  <span style={{ fontSize: 20, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{daysSinceJoined}</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4, letterSpacing: 1 }}>BLOCK</span>
-                  <span style={{ fontSize: 20, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>#{blockNumber}</span>
-                </div>
-              </div>
-              
-              {/* Address Badge */}
-              <div style={{ 
-                display: 'flex', 
-                padding: '6px 14px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: 10,
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-              }}>
-                <span style={{ fontSize: 16, color: '#cbd5e1', fontFamily: 'monospace' }}>{shortAddress}</span>
-              </div>
-            </div>
-
-        </div>
-      ),
-      { 
-        width: 1200,
-        height: 800, // Changed to 3:2 aspect ratio for Farcaster
-        headers: {
-          'Cache-Control': 'public, max-age=300, s-maxage=300',
-          'Content-Type': 'image/png',
-        },
-      }
-    )
-  } catch (error) {
-    console.error('Card generation error:', error)
-    
-    // Return a simple fallback image
     return new ImageResponse(
       (
         <div
@@ -302,22 +149,169 @@ export async function GET(
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#0f0c29',
+            backgroundColor: '#050505',
+            backgroundImage: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000000 100%)',
             fontFamily: 'sans-serif',
           }}
         >
-          <span style={{ fontSize: 48, color: 'white', fontWeight: 700 }}>BaseGenesis</span>
-          <span style={{ fontSize: 24, color: '#64748b', marginTop: 16 }}>Check your Base Genesis rank</span>
+          {/* Card Container - Replicating FlexCard style */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            width: 900,
+            height: 570, // Aspect ratio ~1.58
+            background: rankConfig.gradient,
+            borderRadius: 32,
+            border: `2px solid ${rankConfig.border}`,
+            padding: 48,
+            position: 'relative',
+            boxShadow: `0 20px 60px -10px ${rankConfig.glow}`,
+            overflow: 'hidden',
+          }}>
+            
+            {/* Background Decor */}
+            <div style={{
+              position: 'absolute',
+              top: -80,
+              right: -80,
+              width: 300,
+              height: 300,
+              background: rankConfig.glow,
+              filter: 'blur(80px)',
+              borderRadius: 9999,
+              opacity: 0.4
+            }} />
+
+            {/* Top Row: Brand & Chip */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 10 }}>
+               <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: 16, color: '#9ca3af', fontFamily: 'monospace', letterSpacing: 4, textTransform: 'uppercase' }}>BaseGenesis</span>
+                  <span style={{ fontSize: 20, fontWeight: 700, color: 'white', letterSpacing: 2, marginTop: 4 }}>ID SYSTEM</span>
+               </div>
+               
+               {/* Chip or PFP */}
+               {userPfp ? (
+                 <img 
+                   src={userPfp}
+                   width="80"
+                   height="80"
+                   style={{
+                     borderRadius: 40,
+                     border: '2px solid rgba(255,255,255,0.2)',
+                     objectFit: 'cover',
+                   }}
+                 />
+               ) : (
+                 <div style={{
+                    width: 80,
+                    height: 56,
+                    borderRadius: 12,
+                    background: 'linear-gradient(135deg, rgba(253, 224, 71, 0.2), rgba(234, 179, 8, 0.2))',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 4
+                 }}>
+                    <div style={{ width: 2, height: 24, background: 'rgba(255,255,255,0.3)' }} />
+                    <div style={{ width: 2, height: 24, background: 'rgba(255,255,255,0.3)' }} />
+                    <div style={{ width: 2, height: 24, background: 'rgba(255,255,255,0.3)' }} />
+                 </div>
+               )}
+            </div>
+
+            {/* Middle: Rank Title */}
+            <div style={{ display: 'flex', flexDirection: 'column', zIndex: 10, marginTop: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline' }}>
+                  <span style={{ fontSize: 64, marginRight: 16 }}>{rankConfig.icon}</span>
+                  <span style={{ 
+                    fontSize: 80, 
+                    fontWeight: 900, 
+                    fontStyle: 'italic',
+                    letterSpacing: -2,
+                    color: 'transparent',
+                    backgroundClip: 'text',
+                    backgroundImage: `linear-gradient(to right, ${rankConfig.color}, white)`,
+                    textShadow: `0 0 40px ${rankConfig.glow}`
+                  }}>
+                    {rankTitle[0]} <span style={{ fontSize: 60 }}>{rankTitle[1]}</span>
+                  </span>
+                </div>
+                
+                {/* Decorative Line */}
+                <div style={{ 
+                  height: 6, 
+                  width: 180, 
+                  background: `linear-gradient(to right, ${rankConfig.color}, transparent)`,
+                  borderRadius: 3,
+                  marginTop: 8
+                }} />
+            </div>
+
+            {/* Bottom: Stats Grid */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, zIndex: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    {/* Joined */}
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                            <span style={{ fontSize: 16, color: '#9ca3af', fontFamily: 'monospace', textTransform: 'uppercase' }}>JOINED</span>
+                        </div>
+                        <span style={{ fontSize: 24, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{firstTxDate}</span>
+                    </div>
+
+                    {/* Block */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                            <span style={{ fontSize: 16, color: '#9ca3af', fontFamily: 'monospace', textTransform: 'uppercase' }}>DAYS</span>
+                        </div>
+                        <span style={{ fontSize: 24, color: 'white', fontWeight: 700, fontFamily: 'monospace' }}>{daysSinceJoined}</span>
+                    </div>
+                </div>
+
+                {/* Hash / Footer */}
+                <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    borderTop: '1px solid rgba(255,255,255,0.1)',
+                    paddingTop: 16
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 14, color: '#6b7280', fontFamily: 'monospace' }}>GENESIS TX</span>
+                    </div>
+                    <div style={{ 
+                        background: 'rgba(0, 82, 255, 0.15)',
+                        border: '1px solid rgba(0, 82, 255, 0.3)',
+                        borderRadius: 8,
+                        padding: '4px 12px',
+                    }}>
+                        <span style={{ fontSize: 16, color: '#60A5FA', fontFamily: 'monospace' }}>{txHash}</span>
+                    </div>
+                </div>
+            </div>
+
+          </div>
         </div>
       ),
       { 
         width: 1200,
         height: 800,
         headers: {
-          'Cache-Control': 'public, max-age=60',
+          'Cache-Control': 'public, max-age=300, s-maxage=300',
           'Content-Type': 'image/png',
         },
       }
+    )
+  } catch (error) {
+    console.error('Card generation error:', error)
+    return new ImageResponse(
+      (
+        <div style={{ width: '100%', height: '100%', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+           <span style={{ color: 'white', fontSize: 32 }}>Error Generating Card</span>
+        </div>
+      ),
+      { width: 1200, height: 800 }
     )
   }
 }
